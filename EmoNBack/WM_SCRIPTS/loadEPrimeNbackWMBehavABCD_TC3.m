@@ -179,11 +179,7 @@ for sitez = 1:length(sites)
             subDataPath = [];
             if strfind(subDataFile(i).name,[shortID,'_WM']) % If data file matches shortID and is WM
                 subDataPath = fullfile(subDataFile(i).folder,subDataFile(i).name);
-                if strfind(subDataPath,'txt')
-                    subDataWM = importSubjDataWMtxt(subDataPath);
-                else
-                    subDataWM = importSubjDataWMcsv(subDataPath);
-                end
+                subDataWM = importSubjDataWM(subDataPath);
             end
         end
         if isempty(subDataPath)% Participant did not do WM and could not do REC either
@@ -402,13 +398,9 @@ for sitez = 1:length(sites)
             %}
         for i = 1:length(subDataFile) % Directories may have more than 1 file
             subDataPath = [];
-            if strfind(subDataFile(i).name,[shortID,'_REC']) % If data file matches shortID and is WM
+            if strfind(subDataFile(i).name,[shortID,'_WM']) % If data file matches shortID and is WM
                 subDataPath = fullfile(subDataFile(i).folder,subDataFile(i).name);
-                if strfind(subDataPath,'txt')
-                    subDataRECtxt = importSubjDataRECtxt(subDataPath);
-                else
-                    subDataRECcsv = importSubjDataRECcsv(subDataPath);
-                end
+                subDataWM = importSubjDataWM(subDataPath);
             end
         end
         
@@ -594,3 +586,21 @@ save(fullfile(pwd,'Output/NBack/WM_Variables'))
 %cd(scriptDir)e
 [h,m,s] = hms(datetime('now','Format','HH:mm:ss.SS')-t0); % Clock script runtime
 fprintf('\n\n==========\nNBack Total runtime:\n%02.0f:%02.0f:%02.2f\n==========\n',h,m,s)
+
+function subDataWM = importData(shortID, subDataFile)
+subDataWM = 1;
+while ~strcmp(subDataWM(1),'ExperimentName')
+    for i = 1:length(subDataFile)
+        subDataPath = [];
+        if strfind(subDataFile(i).name,[shortID,'_WM']) % If data file matches shortID and is WM
+            subDataPath = fullfile(subDataFile(i).folder,subDataFile(i).name);
+            if strfind(subDataPath,'txt')
+                subDataWM = importSubjDataWMtxt(subDataPath);
+            else
+                subDataWM = importSubjDataWMcsv(subDataPath);
+            end
+        end
+    end
+end
+
+end
