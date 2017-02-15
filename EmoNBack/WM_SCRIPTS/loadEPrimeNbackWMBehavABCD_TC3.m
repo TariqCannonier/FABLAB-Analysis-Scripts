@@ -170,21 +170,24 @@ for sitez = 1:length(sites)
         % Generate the participant's data directory
         subDataDir = fullfile(subBaseDir,x(ct).name);
         
-        subDataPath = [];
         subDataWMcsv = [];
         subDataWMtxt = [];
         subDataFile = dir(subDataDir);
         subDataFile = subDataFile(arrayfun(@(x)x.name(1),subDataFile)~='.');
         
-        if strfind(subDataFile.name,[shortID,'_WM']) % If data file matches shortID and is WM
-            subDataPath = fullfile(subDataFile.folder,subDataFile.name);
-            if strfind(subDataPath,'txt')
-                subDataWM = importSubjDataWMtxt(subDataPath);
-            else
-                subDataWM = importSubjDataWMcsv(subDataPath);
+        for i = 1:length(subDataFile)
+            subDataPath = [];
+            if strfind(subDataFile(i).name,[shortID,'_WM']) % If data file matches shortID and is WM
+                subDataPath = fullfile(subDataFile(i).folder,subDataFile(i).name);
+                if strfind(subDataPath,'txt')
+                    subDataWM = importSubjDataWMtxt(subDataPath);
+                else
+                    subDataWM = importSubjDataWMcsv(subDataPath);
+                end
             end
-        else % Participant did not do WM and could not do REC either
-           if eSite(1).site == 1 % Initiate error counting
+        end
+        if isempty(subDataPath)% Participant did not do WM and could not do REC either
+            if eSite(1).site == 1 % Initiate error counting
                 eSite(eSite_count).site = Site;
                 eSite(eSite_count).part(eID_count).ID = ID;
                 eSite(eSite_count).part(eID_count).eTask(1) = {'WM'};
@@ -369,7 +372,6 @@ for sitez = 1:length(sites)
         numDataDir = numDataDir(arrayfun(@(x)x.name(1), numDataDir)~='.');
         
         % Process file if folder only has a .txt file formatted in Unicode.
-        subDataPath = [];
         %{
         if length(numDataDir)==1
             subDataPath = fullfile(numDataDir.folder,numDataDir.name);
@@ -398,24 +400,26 @@ for sitez = 1:length(sites)
             subDataPath = fullfile(subDataDir,strcat('NDAR_INV',ID(9:end),'_REC.csv'));
             subDataRECtxt = importSubjDataRECcsv(subDataPath);
             %}
-        for i = 1:lenth(subDataFile)
-            if strfind(subDataFile(i).name,[shortID,'_WM']) % If data file matches shortID and is WM
-                subDataPath = fullfile(subDataFile.folder,subDataFile.name);
+        for i = 1:length(subDataFile) % Directories may have more than 1 file
+            subDataPath = [];
+            if strfind(subDataFile(i).name,[shortID,'_REC']) % If data file matches shortID and is WM
+                subDataPath = fullfile(subDataFile(i).folder,subDataFile(i).name);
                 if strfind(subDataPath,'txt')
-                    subDataWM = importSubjDataWMtxt(subDataPath);
+                    subDataRECtxt = importSubjDataRECtxt(subDataPath);
                 else
-                    subDataWM = importSubjDataWMcsv(subDataPath);
+                    subDataRECcsv = importSubjDataRECcsv(subDataPath);
                 end
             end
+        end
         
-        else
+        if isempty(subDataPath) % Indicates that participant did not do REC
             %        elseif isempty(subDataPath)
             if eSite(1).site == 1 % Initiate error counting
                 eSite(eSite_count).site = Site;
                 eSite(eSite_count).part(eID_count).ID = ID;
                 eSite(eSite_count).part(eID_count).eTask(2) = {'REC'};
                 eID_count = eID_count+1;
-            elseif strcmp(eSite(end).site,Site) % error count; log ID within site
+            elseif strcmp(eSite(end).site,Site) % Error count; log ID within site
                 %eSite(eSite_count).site = Site;
                 eSite(eSite_count).part(eID_count).ID = ID;
                 eSite(eSite_count).part(eID_count).eTask(2) = {'REC'};

@@ -176,15 +176,18 @@ for sitez = 1:length(sites)
         subDataFile = dir(subDataDir);
         subDataFile = subDataFile(arrayfun(@(x)x.name(1),subDataFile)~='.');
         
-        if strfind(subDataFile.name,[shortID,'_WM']) % If data file matches shortID and is WM
-            subDataPath = fullfile(subDataFile.folder,subDataFile.name);
-            if strfind(subDataPath,'txt')
-                subDataWM = importSubjDataWMtxt(subDataPath);
-            else
-                subDataWM = importSubjDataWMcsv(subDataPath);
+        for i = 1:length(subDataFile.name)
+            if strfind(subDataFile(i).name,[shortID,'_WM']) % If data file matches shortID and is WM
+                subDataPath = fullfile(subDataFile.folder,subDataFile.name);
+                if strfind(subDataPath,'txt')
+                    subDataWMtxt = importSubjDataWMtxt(subDataPath);
+                else
+                    subDataWMcsv = importSubjDataWMcsv(subDataPath);
+                end
             end
-        else % Participant did not do WM and could not do REC either
-           if eSite(1).site == 1 % Initiate error counting
+        end
+        if isempty(subDataPath)% Participant did not do WM and could not do REC either
+            if eSite(1).site == 1 % Initiate error counting
                 eSite(eSite_count).site = Site;
                 eSite(eSite_count).part(eID_count).ID = ID;
                 eSite(eSite_count).part(eID_count).eTask(1) = {'WM'};
@@ -398,17 +401,18 @@ for sitez = 1:length(sites)
             subDataPath = fullfile(subDataDir,strcat('NDAR_INV',ID(9:end),'_REC.csv'));
             subDataRECtxt = importSubjDataRECcsv(subDataPath);
             %}
-        for i = 1:lenth(subDataFile)
+        for i = 1:lenth(subDataFile) % Directories may have more than 1 file
             if strfind(subDataFile(i).name,[shortID,'_WM']) % If data file matches shortID and is WM
                 subDataPath = fullfile(subDataFile.folder,subDataFile.name);
                 if strfind(subDataPath,'txt')
-                    subDataWM = importSubjDataWMtxt(subDataPath);
+                    subDataRECtxt = importSubjDataRECtxt(subDataPath);
                 else
-                    subDataWM = importSubjDataWMcsv(subDataPath);
+                    subDataRECcsv = importSubjDataRECcsv(subDataPath);
                 end
             end
+        end
         
-        else
+        if isempty(subDataPath) % Indicates that participant did not do REC
             %        elseif isempty(subDataPath)
             if eSite(1).site == 1 % Initiate error counting
                 eSite(eSite_count).site = Site;
