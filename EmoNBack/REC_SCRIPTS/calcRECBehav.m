@@ -446,7 +446,7 @@ checkNAN = [Happy_TargetHR, Happy_LureHR, Happy_NonlureHR, Fear_TargetHR,...
     Place_TargetHR, Place_LureHR, Place_NonlureHR];
 
 if any(isnan(checkNAN))
-    1
+    %1
     return;
 end
 try
