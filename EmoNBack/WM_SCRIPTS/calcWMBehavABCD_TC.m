@@ -457,7 +457,7 @@ for i = 1:length(Block_WM)
                 if Stim_ACC_WM(i) == 1
                     run2Place0backRTvec(end+1) = Stim_RT_WM(i);    %Create a vector of RTs for correct trials
                 end
-                if Stim_ACC_WM(i) == 0 | Stim_ACC_WM(i) == 1
+                if Stim_ACC_WM(i) == 0 || Stim_ACC_WM(i) == 1
                     run2Place0backACCvec(end+1) = Stim_ACC_WM(i);  %Create a vector of accuracy for all trials
                 end
             end
