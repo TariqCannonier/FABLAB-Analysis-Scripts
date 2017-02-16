@@ -170,17 +170,19 @@ for sitez = 1:length(sites)
         % Generate the participant's data directory
         subDataDir = fullfile(subBaseDir,x(ct).name);
         
-        subDataWMcsv = [];
-        subDataWMtxt = [];
+        subDataWM = 1;
         subDataFile = dir(subDataDir);
         subDataFile = subDataFile(arrayfun(@(x)x.name(1),subDataFile)~='.');
         
-        for i = 1:length(subDataFile)
+        %for i = 1:length(subDataFile)
+        i = 1;
+        while strcmp(subDataWM(1),'ExperimentName')==false && i<=length(subDataFile)
             subDataPath = [];
             if strfind(subDataFile(i).name,[shortID,'_WM']) % If data file matches shortID and is WM
                 subDataPath = fullfile(subDataFile(i).folder,subDataFile(i).name);
                 subDataWM = importSubjDataWM(subDataPath);
             end
+            i = i+1;
         end
         if isempty(subDataPath)% Participant did not do WM and could not do REC either
             if eSite(1).site == 1 % Initiate error counting
@@ -378,8 +380,7 @@ for sitez = 1:length(sites)
         end
         %}
         
-        subDataRECcsv = [];
-        subDataRECtxt = [];
+        subDataREC = {1};
         subDataFile = dir(subDataDir);
         subDataFile = subDataFile(arrayfun(@(x)x.name(1),subDataFile)~='.');
         %{
@@ -396,12 +397,15 @@ for sitez = 1:length(sites)
             subDataPath = fullfile(subDataDir,strcat('NDAR_INV',ID(9:end),'_REC.csv'));
             subDataRECtxt = importSubjDataRECcsv(subDataPath);
             %}
-        for i = 1:length(subDataFile) % Directories may have more than 1 file
+%        for i = 1:length(subDataFile) % Directories may have more than 1 file
+        i = 1;
+        while strcmp(subDataREC(1),'ExperimentName')==false && i<=length(subDataFile)
             subDataPath = [];
-            if strfind(subDataFile(i).name,[shortID,'_WM']) % If data file matches shortID and is WM
+            if strfind(subDataFile(i).name,[shortID,'_REC']) % If data file matches shortID and is REC
                 subDataPath = fullfile(subDataFile(i).folder,subDataFile(i).name);
-                subDataWM = importSubjDataWM(subDataPath);
+                subDataREC = importSubjDataREC(subDataPath);
             end
+            i = i+1;
         end
         
         if isempty(subDataPath) % Indicates that participant did not do REC
@@ -428,16 +432,11 @@ for sitez = 1:length(sites)
             continue;
         end
         
-        if exist(fullfile(subDataDir,strcat('NDAR_INV',ID(9:end),'_REC.txt')),'file')
-            subDataPath = fullfile(subDataDir,strcat('NDAR_INV',ID(9:end),'_REC.txt'));
-            subDataRECtxt = importSubjDataRECtxt(subDataPath);
-        end
+%         if exist(fullfile(subDataDir,strcat('NDAR_INV',ID(9:end),'_REC.txt')),'file')
+%             subDataPath = fullfile(subDataDir,strcat('NDAR_INV',ID(9:end),'_REC.txt'));
+%             subDataREC = importSubjDataREC(subDataPath);
+%         end
         
-        if isempty(subDataRECtxt)
-            subDataREC = subDataRECcsv;
-        else
-            subDataREC = subDataRECtxt;
-        end
         %{
         Attempt to get MATLAB to read improperly exported data.  Do not
         uncomment.
