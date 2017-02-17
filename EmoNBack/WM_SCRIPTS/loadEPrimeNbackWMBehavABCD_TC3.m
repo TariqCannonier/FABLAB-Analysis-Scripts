@@ -128,7 +128,11 @@ for sitez = 1:length(sites)
     
     for subjz = 1:size(subs,1)
         ID = subs{subjz}; % Get participant ID
-        shortID = ID(9:end);
+        if strfind(ID,'_backup') % Determine if file is marked '_backup' and process accordingly
+            shortID = ID(9:strfind(ID,'_backup')-1);
+        else
+            shortID = ID(9:end);
+        end
         subBaseDir = fullfile(dataDir,Site,ID,EventName); % Find path to ePrime output files
         x = dir(subBaseDir);
         x = x(arrayfun(@(x)x.name(1), x)~='.');
@@ -184,7 +188,7 @@ for sitez = 1:length(sites)
             end
             i = i+1;
         end
-        if isempty(subDataPath)% Participant did not do WM and could not do REC either
+        if isempty(subDataPath) || size(subDataWM,1)<189 % Participant did not do WM or WM was not completed and could not do REC either
             if eSite(1).site == 1 % Initiate error counting
                 eSite(eSite_count).site = Site;
                 eSite(eSite_count).part(eID_count).ID = ID;
@@ -408,7 +412,7 @@ for sitez = 1:length(sites)
             i = i+1;
         end
         
-        if isempty(subDataPath) % Indicates that participant did not do REC
+        if isempty(subDataPath) || size(subDataREC,1) < 101% Indicates that participant did not complete REC
             %        elseif isempty(subDataPath)
             if eSite(1).site == 1 % Initiate error counting
                 eSite(eSite_count).site = Site;
@@ -585,21 +589,3 @@ save(fullfile(pwd,'Output/NBack/WM_Variables'))
 %cd(scriptDir)e
 [h,m,s] = hms(datetime('now','Format','HH:mm:ss.SS')-t0); % Clock script runtime
 fprintf('\n\n==========\nNBack Total runtime:\n%02.0f:%02.0f:%02.2f\n==========\n',h,m,s)
-
-function subDataWM = importData(shortID, subDataFile)
-subDataWM = 1;
-while ~strcmp(subDataWM(1),'ExperimentName')
-    for i = 1:length(subDataFile)
-        subDataPath = [];
-        if strfind(subDataFile(i).name,[shortID,'_WM']) % If data file matches shortID and is WM
-            subDataPath = fullfile(subDataFile(i).folder,subDataFile(i).name);
-            if strfind(subDataPath,'txt')
-                subDataWM = importSubjDataWMtxt(subDataPath);
-            else
-                subDataWM = importSubjDataWMcsv(subDataPath);
-            end
-        end
-    end
-end
-
-end
