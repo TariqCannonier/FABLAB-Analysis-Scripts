@@ -188,7 +188,7 @@ for sitez = 1:length(sites)
             end
             i = i+1;
         end
-        if isempty(subDataPath) || size(subDataWM,1)<189 % Participant did not do WM or WM was not completedand could not do REC either
+        if isempty(subDataPath) || size(subDataWM,1)<189 % Participant did not do WM or WM was not completed and could not do REC either
             if eSite(1).site == 1 % Initiate error counting
                 eSite(eSite_count).site = Site;
                 eSite(eSite_count).part(eID_count).ID = ID;
