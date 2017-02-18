@@ -1,0 +1,2 @@
+file -I /Users/tc587/fMRI/ABCD/AWS_Data/aux_incoming_Feb_2017/CUB/NDAR_INVW9750ZMA/baseline_year_1_arm_1/nback-wm-exported_NDAR_INVW9750ZMA_baseline_year_1_arm_1_SessionC/NDAR_INVW9750ZMA_WM.csv
+echo charset

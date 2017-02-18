@@ -18,7 +18,7 @@ dataDir = '/Users/tc587/fMRI/ABCD/AWS_Data/aux_incoming_Feb_2017';
 %% EmoNBack WM & REC
 scriptDir = fullfile(pwd,'EmoNBack/WM_SCRIPTS'); % Notes the directory for supplemental scripts
 
-% Move output files outside of NBack Analysis Package.
+% Move output files outi
 outDir = regexp(pwd,'/');
 outputDir = fullfile(outDir(end),'Output/NBack',datestr(now,'yyyymmdd')); %'/Users/tc587/fMRI/ABCD/ABCD Analysis Package';
 

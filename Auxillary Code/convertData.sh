@@ -2,7 +2,7 @@
 
 # Change directory to where data lives.
 # Change this directory as needed
-dataDir="$HOME/fMRI/ABCD/AWS_Data/aux_incoming_Nov_3rd_2016_2/"
+dataDir="$HOME/fMRI/ABCD/AWS_Data/aux_incoming_Feb_2017/"
 
 #find $dataDir -path "*exported*.txt" -exec -c 'iconv -f UTF-16 -t ASCII {} > {}' \;
 
@@ -50,15 +50,25 @@ for site in *; do
           #    cp $dataDir$data $dataDir${data%'.'*}'_original.txt'
           #    rm $dataDir$data
 
-          cp $dataDir$data $dataPath$part'_original.txt'
-          rm $dataDir$data
+          cp $dataDir$data $dataPath$part'_copy.txt'
+          #rm $dataDir$data
 
-          echo $dataPath'NDAR_INV'$part'_original.txt'
+          #echo $dataPath'NDAR_INV'$part'_original.txt'
 
 
           #    convFile=$dataDir${data%'.'*} #'.txt'
 
-          iconv -f UTF-16 -t ASCII $dataPath$part'_original.txt' > $dataPath'NDAR_INV'$part$tag'.txt'
+          iconv -c -f UTF-16 -t ASCII $dataPath$part'_copy.txt' > $dataPath'NDAR_INV'$part$tag'_corrected.txt'
+
+          rm $dataPath$part'_copy.txt'
+          if [ -s $dataPath'NDAR_INV'$part$tag'_corrected.txt' ]
+          then
+            echo "Conversion has data!"
+          else
+            echo "this shit is empty!"
+            rm $dataPath'NDAR_INV'$part$tag'_corrected.txt'
+          fi
+
           #d=${d%'.'*}
           #echo ${data%'.'*}
           #echo $dataDir${data}
