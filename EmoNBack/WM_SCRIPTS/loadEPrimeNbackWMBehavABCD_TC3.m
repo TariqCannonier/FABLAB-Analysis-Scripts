@@ -189,7 +189,7 @@ for sitez = 1:length(sites)
             i = i+1;
         end
         
-        endIndex = strcmpi(subDataWM(1,:),'Procedure[Block]');
+        [~,endIndex]= find(strcmpi(subDataWM(1:2,:),'Procedure[Block]'));
         if isempty(subDataPath) || ~strcmpi(subDataWM{end,endIndex},'EndProc') % Participant did not do WM or WM was not completed and could not do REC either
             if eSite(1).site == 1 % Initiate error counting
                 eSite(eSite_count).site = Site;
@@ -364,7 +364,7 @@ for sitez = 1:length(sites)
             i = i+1;
         end
         
-        endIndex = strcmpi(subDataREC(1,:),'Procedure[Block]'); 
+        [~,endIndex]= find(strcmpi(subDataREC(1:2,:),'Procedure[Block]'));
         if isempty(subDataPath) || ~strcmpi(subDataREC{end,endIndex},'ProcDone') % Indicates that participant did not complete REC
             %        elseif isempty(subDataPath)
             if eSite(1).site == 1 % Initiate error counting
