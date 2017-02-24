@@ -114,7 +114,7 @@ eSite(1).site = 1; % Initialize struct for erroneous ID/datapoints
 eSite_count = 1; % Initialize count for erroneous ID/datapoints
 
 % Debugging erroroneous sites
-load('/Users/tc587/fMRI/ABCD/NBack Analaysis Package/Output/NBack/WM_Variables.mat','eSite')
+%load('/Users/tc587/fMRI/ABCD/NBack Analaysis Package/Output/NBack/WM_Variables.mat','eSite')
 
 for sitez = 1:length(sites)
     Site = sites{sitez};
@@ -188,7 +188,9 @@ for sitez = 1:length(sites)
             end
             i = i+1;
         end
-        if isempty(subDataPath) || size(subDataWM,1)<189 % Participant did not do WM or WM was not completed and could not do REC either
+        
+        endIndex = strcmpi(subDataWM(1,:),'Procedure[Block]');
+        if isempty(subDataPath) || ~strcmpi(subDataWM{end,endIndex},'EndProc') % Participant did not do WM or WM was not completed and could not do REC either
             if eSite(1).site == 1 % Initiate error counting
                 eSite(eSite_count).site = Site;
                 eSite(eSite_count).part(eID_count).ID = ID;
@@ -214,33 +216,7 @@ for sitez = 1:length(sites)
             continue
             %break            
         end
-        %{
-        if exist(fullfile(subDataDir,strcat(ID(9:end),'_WM.txt')),'file')
-            subDataPath = fullfile(subDataDir,strcat(ID(9:end),'_WM.txt'));
-            subDataWMcsv = importSubjDataWMtxt(subDataPath);
-        elseif exist(fullfile(subDataDir,strcat('NDAR_INV',ID(9:end),'_WM.txt')),'file')
-            subDataPath = fullfile(subDataDir,strcat('NDAR_INV',ID(9:end),'_WM.txt'));
-            subDataWMcsv = importSubjDataWMtxt(subDataPath);
-        elseif exist(fullfile(subDataDir,strcat('NDAR_INV',ID(9:end),'_WM.csv')),'file')
-            subDataPath = fullfile(subDataDir,strcat('NDAR_INV',ID(9:end),'_WM.csv'));
-            subDataWMtxt = importSubjDataWMcsv(subDataPath);
-        elseif exist(fullfile(subDataDir,strcat(ID(9:end),'_WM.csv')),'file')
-            subDataPath = fullfile(subDataDir,strcat(ID(9:end),'_WM.csv'));
-            subDataWMtxt = importSubjDataWMcsv(subDataPath);
-        end
-        
-        if isempty(subDataWMtxt)
-            subDataWM = subDataWMcsv;
-        else
-            subDataWM = subDataWMtxt;
-        end
-        %}
-        %{
-        Attempt to get MATLAB to read improperly exported data.  Do not
-        uncomment.
-        subData = textscan(subDataPathTest,'%s','delimiter','\n','whitespace','');
-        subData = regexp(testData{2:end,:},',','split');
-        %}
+
         %% Evaluate WM
         try
             for i = 1:length(Conditions_WM) % Loop through conditions
@@ -372,36 +348,12 @@ for sitez = 1:length(sites)
         % Concatenate and Import the participant's data
         numDataDir = dir(subDataDir);
         numDataDir = numDataDir(arrayfun(@(x)x.name(1), numDataDir)~='.');
-        
-        % Process file if folder only has a .txt file formatted in Unicode.
-        %{
-        if length(numDataDir)==1
-            subDataPath = fullfile(numDataDir.folder,numDataDir.name);
-        elseif exist(fullfile(subDataDir,strcat(ID(9:end),'_REC.csv')),'file')
-            subDataPath = fullfile(subDataDir,strcat(ID(9:end),'_REC.csv'));
-        elseif exist(fullfile(subDataDir,strcat('NDAR_INV',ID(9:end),'_REC.csv')),'file')
-            subDataPath = fullfile(subDataDir,strcat('NDAR_INV',ID(9:end),'_REC.csv'));
-        end
-        %}
+
         
         subDataREC = {1};
         subDataFile = dir(subDataDir);
         subDataFile = subDataFile(arrayfun(@(x)x.name(1),subDataFile)~='.');
-        %{
-        if exist(fullfile(subDataDir,strcat(ID(9:end),'_REC.txt')),'file')
-            subDataPath = fullfile(subDataDir,strcat(ID(9:end),'_REC.txt'));
-            subDataRECcsv = importSubjDataRECtxt(subDataPath);
-        elseif exist(fullfile(subDataDir,strcat('NDAR_INV',ID(9:end),'_REC.txt')),'file')
-            subDataPath = fullfile(subDataDir,strcat('NDAR_INV',ID(9:end),'_REC.txt'));
-            subDataRECcsv = importSubjDataRECtxt(subDataPath);
-        elseif exist(fullfile(subDataDir,strcat(ID(9:end),'_REC.csv')),'file')
-            subDataPath = fullfile(subDataDir,strcat(ID(9:end),'_REC.csv'));
-            subDataRECtxt = importSubjDataRECcsv(subDataPath);
-        elseif exist(fullfile(subDataDir,strcat('NDAR_INV',ID(9:end),'_REC.csv')),'file')
-            subDataPath = fullfile(subDataDir,strcat('NDAR_INV',ID(9:end),'_REC.csv'));
-            subDataRECtxt = importSubjDataRECcsv(subDataPath);
-            %}
-%        for i = 1:length(subDataFile) % Directories may have more than 1 file
+
         i = 1;
         while strcmp(subDataREC(1),'ExperimentName')==false && i<=length(subDataFile)
             subDataPath = [];
@@ -412,7 +364,8 @@ for sitez = 1:length(sites)
             i = i+1;
         end
         
-        if isempty(subDataPath) || size(subDataREC,1) < 101% Indicates that participant did not complete REC
+        endIndex = strcmpi(subDataREC(1,:),'Procedure[Block]'); 
+        if isempty(subDataPath) || ~strcmpi(subDataREC{end,endIndex},'ProcDone') % Indicates that participant did not complete REC
             %        elseif isempty(subDataPath)
             if eSite(1).site == 1 % Initiate error counting
                 eSite(eSite_count).site = Site;

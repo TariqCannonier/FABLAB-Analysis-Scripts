@@ -19,8 +19,9 @@ dataDir = '/Users/tc587/fMRI/ABCD/AWS_Data/aux_incoming_Feb_2017';
 scriptDir = fullfile(pwd,'EmoNBack/WM_SCRIPTS'); % Notes the directory for supplemental scripts
 
 % Move output files outside of NBack Analysis Package.
+pwdir = pwd;
 outDir = regexp(pwd,'/');
-outputDir = fullfile(outDir(end),'Output/NBack',datestr(now,'yyyymmdd')); %'/Users/tc587/fMRI/ABCD/ABCD Analysis Package';
+outputDir = fullfile(pwdir(1:outDir(end)),'Output/NBack',datestr(now,'yyyymmdd')); % Place output outside of Analysis Package
 
 % Run EmoNBack Analysis
 run('loadEPrimeNbackWMBehavABCD_TC3.m')
