@@ -9,9 +9,18 @@
     csvfileWM = dir(fullfile(file(end).folder,file(end).name,'EmoNback_WMBehaviorABCD*.csv'));
     csvfileREC = dir(fullfile(file(end).folder,file(end).name,'EmoNback_RECBehaviorABCD*.csv'));
     %csvfile = dir(fullfile('/Users/tc587/fMRI/ABCD/ABCD Analysis Package/Output/NBack/',datestr(now,'yyyymmdd'),'EmoNback_RECBehaviorABCD*.csv'));
-    [ExperimentName,Site_WM,NDARGUID_WM,Version,Overall_RT,Overall_ACC,HappyBlocks_RT,HappyBlocks_ACC,FearBlocks_RT,FearBlocks_ACC,NeutBlocks_RT,NeutBlocks_ACC,PlaceBlocks_RT,PlaceBlocks_ACC,Overall0back_RT,Overall0back_ACC,Happy0back_RT,Happy0back_ACC,Fear0back_RT,Fear0back_ACC,Neut0back_RT,Neut0back_ACC,Place0back_RT,Place0back_ACC,Overall2back_RT,Overall2back_ACC,Happy2back_RT,Happy2back_ACC,Fear2back_RT,Fear2back_ACC,Neut2back_RT,Neut2back_ACC,Place2back_RT,Place2back_ACC,run1Overall_RT,run1Overall_ACC,run1HappyBlocks_RT,run1HappyBlocks_ACC,run1FearBlocks_RT,run1FearBlocks_ACC,run1NeutBlocks_RT,run1NeutBlocks_ACC,run1PlaceBlocks_RT,run1PlaceBlocks_ACC,run1Happy0back_RT,run1Happy0back_ACC,run1Fear0back_RT,run1Fear0back_ACC,run1Neut0back_RT,run1Neut0back_ACC,run1Place0back_RT,run1Place0back_ACC,run1Happy2back_RT,run1Happy2back_ACC,run1Fear2back_RT,run1Fear2back_ACC,run1Neut2back_RT,run1Neut2back_ACC,run1Place2back_RT,run1Place2back_ACC,run2Overall_RT,run2Overall_ACC,run2HappyBlocks_RT,run2HappyBlocks_ACC,run2FearBlocks_RT,run2FearBlocks_ACC,run2NeutBlocks_RT,run2NeutBlocks_ACC,run2PlaceBlocks_RT,run2PlaceBlocks_ACC,run2Happy0back_RT,run2Happy0back_ACC,run2Fear0back_RT,run2Fear0back_ACC,run2Neut0back_RT,run2Neut0back_ACC,run2Place0back_RT,run2Place0back_ACC,run2Happy2back_RT,run2Happy2back_ACC,run2Fear2back_RT,run2Fear2back_ACC,run2Neut2back_RT,run2Neut2back_ACC,run2Place2back_RT,run2Place2back_ACC,Nonlure_ACC,Lure_ACC,Target_ACC,HappyTargetHR,HappyLureFA,HappyNonlureFA,FearTargetHR,FearLureFA,FearNonlureFA,NeutTargetHR,NeutLureFA,NeutNonlureFA,PlaceTargetHR,PlaceLureFA,PlaceNonlureFA] = importWM(fullfile(csvfileWM(end).folder,csvfileWM(end).name));
-    [ExperimentName,Site_REC,NDARGUID_REC,Version,SessionDate,Happy_HR,Happy_FA,Happy_Pr,Happy_Br,Happy_Miss,Happy_CR,Happy_dprime,Fear_HR,Fear_FA,Fear_Pr,Fear_Br,Fear_Miss,Fear_CR,Fear_dprime,Neut_HR,Neut_FA,Neut_Pr,Neut_Br,Neut_Miss,Neut_CR,Neut_dprime,Place_HR,Place_FA,Place_Pr,Place_Br,Place_Miss,Place_CR,Place_dprime,Happy0back_HR,Fear0back_HR,Neut0back_HR,Place0back_HR,Happy2back_HR,Fear2back_HR,Neut2back_HR,Place2back_HR,Happy_TargetHR,Happy_LureHR,Happy_NonlureHR,Fear_TargetHR,Fear_LureHR,Fear_NonlureHR,Neut_TargetHR,Neut_LureHR,Neut_NonlureHR,Place_TargetHR,Place_LureHR,Place_NonlureHR,ThreeExposure0backTargetStim,TwoExposure2backTargetStim,TwoExposure0backLureStim,TwoExposure2backLureStim,OneExposure0backStim,OneExposure2backStim] = importREC(fullfile(csvfileREC(end).folder,csvfileREC(end).name));
+    WM = importWMtable(fullfile(csvfileWM(end).folder,csvfileWM(end).name));
+    REC = importRECtable(fullfile(csvfileREC(end).folder,csvfileREC(end).name));
 %end
+[~, b1, ~] = unique(WM(:,'NDARGUID'),'stable');
+WM = WM(b1,:);
+[~, b2, ~] = unique(REC(:,'NDARGUID'),'stable');
+REC = REC(b2,:);
+element1 = ismember(WM(:,'NDARGUID'),REC(:,'NDARGUID')); % What elements of A are in B
+WM = WM(element1,:);
+element2 = ismember(REC(:,'NDARGUID'),WM(:,'NDARGUID'));
+REC = REC(element2,:);
+
 close all
 
 %saveDir = fullfile(pwd,'Plots/Boxplots',datestr(now,'yyyymmdd')); % Save data to designated directory
@@ -24,7 +33,7 @@ end
 gray_matrix = gray;
 gray_index = 35; % Lower is darker, Higher is lighter
 %% REC: Plot Happy, Fear, Neutral, Place Overall d'
-Overall = [Happy_dprime, Fear_dprime, Neut_dprime, Place_dprime];
+Overall = table2array(REC(:,{'Happy_dprime', 'Fear_dprime', 'Neut_dprime', 'Place_dprime'}));
 plotLabels = {'Happy','Fear','Neut','Place'};
 
 fig(1) = figure(1);
@@ -102,55 +111,48 @@ ct = ct+1;
 %}
 %% Plot Target, Lure, Nonlure HitRates
 cutData = [];
-xx = [isnan(Happy_TargetHR),isnan(Happy_LureHR),isnan(Happy_NonlureHR)];
-yy = sum(xx);
-if ~(yy(1)==yy(2))&&(yy(2)==yy(3))&&(yy(1)==yy(3))
-    [~, i] = max(yy);
-    Happy_TargetHR(xx(:,i),:) = [];
-    Happy_LureHR(xx(:,i),:) = [];
-    Happy_NonlureHR(xx(:,i),:) = [];
+HappyREC = {'Happy_TargetHR','Happy_LureHR','Happy_NonlureHR'};
+FearREC = {'Fear_TargetHR','Fear_LureHR','Fear_NonlureHR'};
+NeutREC = {'Neut_TargetHR','Neut_LureHR','Neut_NonlureHR'};
+PlaceREC = {'Place_TargetHR','Place_LureHR','Place_NonlureHR'};
+
+TargetREC = {'Happy_TargetHR','Fear_TargetHR','Neut_TargetHR','Place_TargetHR'};
+LureREC = {'Happy_LureHR','Fear_LureHR','Neut_LureHR','Place_LureHR'};
+NonlureREC = {'Happy_NonlureHR','Fear_NonlureHR','Neut_NonlureHR','Place_NonlureHR'};
+NontargetREC = [LureREC,NonlureREC{:}];
+
+switch find(sum(ismissing(REC(:,TargetREC)))==max(sum(ismissing(REC(:,TargetREC)))))
+    case 1
+        cutData = ismissing(REC(:,'Happy_TargetHR'));
+        WM(cutData,:) = [];
+        REC(cutData,:) = [];
+    case 2
+        cutData = ismissing(REC(:,'Fear_TargetHR'));
+        WM(cutData,:) = [];
+        REC(cutData,:) = [];
+    case 3
+        cutData = ismissing(REC(:,'Neut_TargetHR'));
+        WM(cutData,:) = [];
+        REC(cutData,:) = [];
+    case 4
+        cutData = ismissing(REC(:,'Place_TargetHR'));
+        WM(cutData,:) = [];
+        REC(cutData,:) = [];
+    otherwise
 end
+%%
 %{
-cutData = [cutData; find(isnan(Happy_TargetHR))];
-cutData = [cutData; find(isnan(Happy_LureHR))];
-cutData = [cutData; find(isnan(Happy_NonlureHR))];
-cutData = [cutData; find(isnan(Fear_TargetHR))];
-cutData = [cutData; find(isnan(Fear_LureHR))];
-cutData = [cutData; find(isnan(Fear_NonlureHR))];
-cutData = [cutData; find(isnan(Neut_TargetHR))];
-cutData = [cutData; find(isnan(Neut_LureHR))];
-cutData = [cutData; find(isnan(Neut_NonlureHR))];
-cutData = [cutData; find(isnan(Place_TargetHR))];
-cutData = [cutData; find(isnan(Place_LureHR))];
-cutData = [cutData; find(isnan(Place_NonlureHR))];
-%}
+Fear_TargetHR(isnan(Fear_TargetHR)) = [];
+Fear_LureHR(isnan(Fear_LureHR)) = [];
+Fear_NonlureHR(isnan(Fear_NonlureHR)) = [];
 
-xx = [isnan(Fear_TargetHR),isnan(Fear_LureHR),isnan(Fear_NonlureHR)];
-yy = sum(xx);
-if ~(yy(1)==yy(2))&&(yy(2)==yy(3))&&(yy(1)==yy(3))
-    [~, i] = max(yy);
-    Fear_TargetHR(xx(:,i),:) = [];
-    Fear_LureHR(xx(:,i),:) = [];
-    Fear_NonlureHR(xx(:,i),:) = [];
-end
+Neut_TargetHR(isnan(Neut_TargetHR)) = [];
+Neut_LureHR(isnan(Neut_LureHR)) = [];
+Neut_NonlureHR(isnan(Neut_NonlureHR)) = [];
 
-xx = [isnan(Neut_TargetHR),isnan(Neut_LureHR),isnan(Neut_NonlureHR)];
-yy = sum(xx);
-if ~(yy(1)==yy(2))&&(yy(2)==yy(3))&&(yy(1)==yy(3))
-    [~, i] = max(yy);
-    Neut_TargetHR(xx(:,i),:) = [];
-    Neut_LureHR(xx(:,i),:) = [];
-    Neut_NonlureHR(xx(:,i),:) = [];
-end
-
-xx = [isnan(Place_TargetHR),isnan(Place_LureHR),isnan(Place_NonlureHR)];
-yy = sum(xx);
-if ~(yy(1)==yy(2))&&(yy(2)==yy(3))&&(yy(1)==yy(3))
-    [~, i] = max(yy);
-    Place_TargetHR(xx(:,i),:) = [];
-    Place_LureHR(xx(:,i),:) = [];
-    Place_NonlureHR(xx(:,i),:) = [];
-end
+Place_TargetHR(isnan(Place_TargetHR)) = [];
+Place_LureHR(isnan(Place_LureHR)) = [];
+Place_NonlureHR(isnan(Place_NonlureHR)) = [];
 
 mean_HappyTarget = mean(Happy_TargetHR);
 mean_HappyLure = mean(Happy_LureHR);
@@ -164,10 +166,10 @@ mean_NeutNonlure = mean(Neut_NonlureHR);
 mean_PlaceTarget = mean(Place_TargetHR);
 mean_PlaceLure = mean(Place_LureHR);
 mean_PlaceNonlure = mean(Place_NonlureHR);
-
-mean_Target = mean([Happy_TargetHR,Fear_TargetHR,Neut_TargetHR,Place_TargetHR],2);
-mean_NonTarget = mean([Happy_LureHR,Happy_NonlureHR,Fear_LureHR,...
-    Fear_NonlureHR,Neut_LureHR,Neut_NonlureHR,Place_LureHR,Place_NonlureHR],2);
+%}
+Overall = table2array(REC(:,{'Happy_dprime', 'Fear_dprime', 'Neut_dprime', 'Place_dprime'}));
+mean_Target = mean(table2array(REC(:,TargetREC)));
+mean_NonTarget = mean(table2array(REC(:,NontargetREC))); 
 
 fig(ct) = figure(ct);
 hold on
@@ -176,10 +178,10 @@ set(gca,'Fontsize',24,'XTicklabel',plotLabels,'XTick',1:4)
 title('RecMem: Average HitRate by StimType','Fontsize',36)
 xlabel('StimType','Fontsize',30)
 ylabel('HitRate','Fontsize',30);
-bar_handle = bar([mean_HappyTarget,mean_HappyLure, mean_HappyNonlure;...Hap
-    mean_FearTarget,mean_FearLure,mean_FearNonlure;...
-    mean_NeutTarget,mean_NeutLure,mean_NeutNonlure;...
-    mean_PlaceTarget,mean_PlaceLure,mean_PlaceNonlure],'grouped');
+
+bar_handle = bar([mean(table2array(REC(:,HappyREC)));...
+    mean(table2array(REC(:,FearREC)));mean(table2array(REC(:,NeutREC)));...
+    mean(table2array(REC(:,PlaceREC)))],'grouped');
 legh = legend('Target','Lure','Nonlure');
 set(legh,'Position',[0.8 0.8 0.1 0.075],'Linewidth',1.5)
 set(bar_handle(3),'FaceColor',gray_matrix(end,:))
@@ -187,7 +189,7 @@ set(bar_handle(2),'FaceColor',gray_matrix(floor(length(gray_matrix)*2/3),:))
 set(bar_handle(1),'FaceColor',gray_matrix(floor(length(gray_matrix)/3),:))
 hold off
 
-ct = ct+1;
+%ct = ct+1;
 
 %% Correlation
 %{
@@ -225,52 +227,75 @@ close all
 %% Edits For BJ
 % Variable Declaration
 % NBack HR
-Nback0_HR = mean([Happy0back_HR,Fear0back_HR,Neut0back_HR,Place0back_HR],2);
-Nback2_HR = mean([Happy2back_HR,Fear2back_HR,Neut2back_HR,Place2back_HR],2);
-NbackX_HR = mean([Happy0back_HR,Fear0back_HR,Neut0back_HR,Place0back_HR,...
-    Happy2back_HR,Fear2back_HR,Neut2back_HR,Place2back_HR],2);
+Nback0_HR = mean(table2array(REC(:,{'Happy0back_HR','Fear0back_HR',...
+    'Neut0back_HR','Place0back_HR'})),2);
+Nback2_HR = mean(table2array(REC(:,{'Happy2back_HR','Fear2back_HR',...
+    'Neut2back_HR','Place0back_HR'})),2);
+NbackX_HR = mean(table2array(REC(:,{'Happy0back_HR','Fear0back_HR',...
+    'Neut0back_HR','Place0back_HR','Happy2back_HR','Fear2back_HR',...
+    'Neut2back_HR','Place0back_HR'})),2);
 
 % NBack Miss
-Nback0_Miss = mean(1-[Happy0back_HR,Fear0back_HR,Neut0back_HR,Place0back_HR],2);
-Nback2_Miss = mean(1-[Happy2back_HR,Fear2back_HR,Neut2back_HR,Place2back_HR],2);
-NbackX_Miss = mean(1-[Happy0back_HR,Fear0back_HR,Neut0back_HR,Place0back_HR,...
-    Happy2back_HR,Fear2back_HR,Neut2back_HR,Place2back_HR],2);
+Nback0_Miss = mean(1-table2array(REC(:,{'Happy0back_HR','Fear0back_HR',...
+    'Neut0back_HR','Place0back_HR'})),2);
+Nback2_Miss = mean(1-table2array(REC(:,{'Happy2back_HR','Fear2back_HR',...
+    'Neut2back_HR','Place0back_HR'})),2);
+NbackX_Miss = mean(1-table2array(REC(:,{'Happy0back_HR','Fear0back_HR',...
+    'Neut0back_HR','Place0back_HR','Happy2back_HR','Fear2back_HR',...
+    'Neut2back_HR','Place0back_HR'})),2);
 
 % NBack Targets, Nontargets, Lure, and Nonlure
-TargetHR = mean([Happy_TargetHR,Fear_TargetHR,Neut_TargetHR,Place_TargetHR],2);
-NonTarget = mean([Happy_LureHR,Fear_LureHR,Neut_LureHR,Place_LureHR,...
-    Happy_NonlureHR,Fear_NonlureHR,Neut_NonlureHR,Place_NonlureHR],2);
-Lure = mean([Happy_LureHR,Fear_LureHR,Neut_LureHR,Place_LureHR],2);
-Nonlure = mean([Happy_NonlureHR,Fear_NonlureHR,Neut_NonlureHR,Place_NonlureHR],2);
-AllHR = mean([TargetHR,Lure,Nonlure],2);
+TargetHR = mean(table2array(REC(:,TargetREC)),2);
+NonTargetHR = mean(table2array(REC(:,NontargetREC)),2);
+LureHR = mean(table2array(REC(:,LureREC)),2);
+NonlureHR = mean(table2array(REC(:,NonlureREC)),2);
+AllHR = mean([TargetHR,LureHR,NonlureHR],2);
 
 % RecMem HR, FA
-RecMemHR = mean([Happy_HR, Fear_HR, Neut_HR, Place_HR],2);
-RecMemFA = mean([Happy_FA, Fear_FA, Neut_FA, Place_FA],2);
+RecMemHR = mean(table2array(REC(:,{'Happy_HR','Fear_HR','Neut_HR','Place_HR'})),2); %[Happy_HR, Fear_HR, Neut_HR, Place_HR],2);
+RecMemFA = mean(table2array(REC(:,{'Happy_FA','Fear_FA','Neut_FA','Place_FA'})),2);%[Happy_FA, Fear_FA, Neut_FA, Place_FA],2);
 
 % WM
-HappyWM_HR = mean([HappyTargetHR,HappyNonlureFA,HappyLureFA],2);
-FearWM_HR = mean([FearTargetHR,FearNonlureFA,FearLureFA],2);
-NeutWM_HR = mean([NeutTargetHR,NeutNonlureFA,NeutLureFA],2);
-PlaceWM_HR = mean([PlaceTargetHR,PlaceNonlureFA,PlaceLureFA],2);
-TargetWM_HR = mean([HappyTargetHR,FearTargetHR,NeutTargetHR,PlaceTargetHR],2);
-NonlureWM_FA = mean([HappyNonlureFA,FearNonlureFA,NeutNonlureFA,PlaceNonlureFA],2);
-LureWM_FA = mean([HappyLureFA,FearLureFA,NeutLureFA,PlaceLureFA],2);
-NontargetWM_FA = mean([HappyNonlureFA,FearNonlureFA,NeutNonlureFA,PlaceNonlureFA,...
-    HappyLureFA,FearLureFA,NeutLureFA,PlaceLureFA],2);
+HappyWM = {'HappyTargetHR','HappyLureFA','HappyNonlureFA'};
+FearWM = {'FearTargetHR','FearLureFA','FearNonlureFA'};
+NeutWM = {'NeutTargetHR','NeutLureFA','NeutNonlureFA'};
+PlaceWM = {'PlaceTargetHR','PlaceLureFA','PlaceNonlureFA'};
+TargetWM = {'HappyTargetHR','FearTargetHR','NeutTargetHR','PlaceTargetHR'};
+LureWM = {'HappyLureFA','FearLureFA','NeutLureFA','PlaceLureFA'};
+NonlureWM = {'HappyNonlureFA','FearNonlureFA','NeutNonlureFA','PlaceNonlureFA'};
+
+HappyWM_HR = mean(table2array(WM(:,HappyWM)),2);
+FearWM_HR = mean(table2array(WM(:,FearWM)),2);
+NeutWM_HR = mean(table2array(WM(:,NeutWM)),2);
+PlaceWM_HR = mean(table2array(WM(:,PlaceWM)),2);
+TargetWM_HR = mean(table2array(WM(:,TargetWM)),2);
+LureWM_FA = mean(table2array(WM(:,LureWM)),2);
+NonlureWM_FA = mean(table2array(WM(:,NonlureWM)),2);
+NontargetWM_FA = mean(table2array(WM(:,[LureWM,NonlureWM{:}])));
+
 ct = 1;
 %% Correlations for BJ
 %NDARGUID_REC(cellfun(@isempty,NDARGUID_REC)) = []; % If REC has empty space
-% element = ismember(NDARGUID_WM,NDARGUID_REC); % What elements of A are in B
-% new_NDARGUID_WM = NDARGUID_WM(element);
-% Overall_ACC = Overall_ACC(element); % index only the AnB
-% Target_ACC = Target_ACC(element);
-% Lure_ACC = Lure_ACC(element);
-% Nonlure_ACC = Nonlure_ACC(element);
-% TargetWM_HR = TargetWM_HR(element);
-% LureWM_FA = LureWM_FA(element);
-% NonlureWM_FA = NonlureWM_FA(element);
-% NontargetWM_FA = NontargetWM_FA(element);
+% Use only the unique PGUIDs for each participant
+%{
+[~, b, ~] = unique(WM(:,'NDARGUID'),'stable');
+WM = WM(b,:);
+[~, b, ~] = unique(REC(:,'NDARGUID'),'stable');
+REC = REC(b,:);
+element1 = ismember(WM(:,'NDARGUID'),REC(:,'NDARGUID')); % What elements of A are in B
+WM = WM(element1,:);
+element2 = ismember(REC(:,'NDARGUID'),REC(:,'NDARGUID'));
+REC = REC(element2,:);
+%}
+
+Overall_ACC = table2array(WM(:,'Overall_ACC')); % index only the AnB
+Target_ACC = table2array(WM(:,'Target_ACC'));
+Lure_ACC = table2array(WM(:,'Lure_ACC'));
+Nonlure_ACC = table2array(WM(:,'Nonlure_ACC'));
+%TargetWM_HR = TargetWM_HR(element);
+%LureWM_FA = LureWM_FA(element);
+%NonlureWM_FA = NonlureWM_FA(element);
+%NontargetWM_FA = NontargetWM_FA(element);
 
 Overall_prime = mean(Overall,2);
 Overall_prime = Overall_prime(~isnan(Overall_prime));
@@ -359,15 +384,15 @@ histogram(TargetHR)
 xlabel('Targets','Fontsize',font)
 
 subplot(4,1,2)
-histogram(Lure)
+histogram(LureHR)
 xlabel('Lures','Fontsize',font)
 
 subplot(4,1,3)
-histogram(Nonlure)
+histogram(NonlureHR)
 xlabel('Nonlures','Fontsize',font)
 
 subplot(4,1,4)
-histogram(NonTarget)
+histogram(NonTargetHR)
 xlabel('NonTargets','Fontsize',font)
 %{
 %t = sprintf('Overall_TLN: Hit[N-Back] & Hit[RecMem] [All]'); %HR Nback v HR RecMem across All emoValence
@@ -636,10 +661,13 @@ function scatter2(ct,X,Y,color1,color2,t)
     % Creates scatter plots w/o the subplot feature
     figure(ct)
     %ann_dim = [.15, .775, .1, .1; .15, .3, .1, .1];
-    saveDir = '/Users/tc587/fMRI/ABCD/NBack Analaysis Package/Output/NBack/20170210';
+    saveDir = '/Users/tc587/fMRI/ABCD/Output/NBack/20170228/';
     ann_dim = [.15, .775, .1, .1; .15, .775, .1, .1];
+    cutData = isnan(X);
+    X(cutData) = [];
+    Y(cutData) = [];
     hold on
-    ti = title(t,'Fontsize',20);
+    ti = title(sprintf([t, ' [N = %2.0f]'],length(X)),'Fontsize',20);
     set(ti,'interpreter','none')
     scatter(X,Y,[],color1,'filled')
     p = polyfit(X,Y,1);
@@ -656,7 +684,7 @@ function scatter2(ct,X,Y,color1,color2,t)
         HM = 'FA';
     end
 %}
-    label_ind = findstr(' ',t);
+    label_ind = strfind(t,' ');
     %t(label_ind(1)+1:label_ind(2)-1)
     xl = xlabel(t(label_ind(1)+1:label_ind(2)-1),'Fontsize',16);
     if strfind(t,'Dprime')
@@ -691,7 +719,7 @@ function scatter2(ct,X,Y,color1,color2,t)
     hold off
     saveas(gcf,fullfile(saveDir,'Plots',t),'jpg')
 end
-
+%{
 function scatter3(ct,X,Y,color1,color2,t,subplot_ind)
     % Creates scatter plots with subplots by subplot_ind
     saveDir = '/Users/tc587/fMRI/ABCD/NBack Analaysis Package/Output/NBack/20170123';
@@ -727,3 +755,4 @@ function scatter3(ct,X,Y,color1,color2,t,subplot_ind)
         saveas(gcf,fullfile(saveDir,'Plots/SubPlots',t),'jpg')
     end
 end
+%}

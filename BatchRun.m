@@ -22,6 +22,7 @@ scriptDir = fullfile(pwd,'EmoNBack/WM_SCRIPTS'); % Notes the directory for suppl
 pwdir = pwd;
 outDir = regexp(pwd,'/');
 outputDir = fullfile(pwdir(1:outDir(end)),'Output/NBack',datestr(now,'yyyymmdd')); % Place output outside of Analysis Package
+outputInd = regexp(outputDir,'/');
 
 % Run EmoNBack Analysis
 run('loadEPrimeNbackWMBehavABCD_TC3.m')

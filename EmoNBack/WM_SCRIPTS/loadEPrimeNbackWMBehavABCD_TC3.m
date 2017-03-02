@@ -189,8 +189,8 @@ for sitez = 1:length(sites)
             i = i+1;
         end
         
-        [~,endIndex]= find(strcmpi(subDataWM(1:2,:),'Procedure[Block]'));
-        if isempty(subDataPath) || ~strcmpi(subDataWM{end,endIndex},'EndProc') % Participant did not do WM or WM was not completed and could not do REC either
+        %[~,endIndex]= find(strcmpi(subDataWM(1:2,:),'Procedure[Block]'));
+        if isempty(subDataPath) || ~any(strcmpi(subDataWM(end,:),'EndProc')) % Participant did not do WM or WM was not completed and could not do REC either
             if eSite(1).site == 1 % Initiate error counting
                 eSite(eSite_count).site = Site;
                 eSite(eSite_count).part(eID_count).ID = ID;
@@ -284,7 +284,7 @@ for sitez = 1:length(sites)
         clear ExperimentName NDARGUID
         
         ExperimentName = subDataWM{2,1}(1:length(subDataWM{2,1}));
-        NDARGUID = subDataWM{2,14};
+        NDARGUID = upper(subDataWM{2,14});
         Version = subDataWM{2,17};
         
         % Run scripts to create remaining variables
@@ -364,8 +364,7 @@ for sitez = 1:length(sites)
             i = i+1;
         end
         
-        [~,endIndex]= find(strcmpi(subDataREC(1:2,:),'Procedure[Block]'));
-        if isempty(subDataPath) || ~strcmpi(subDataREC{end,endIndex},'ProcDone') % Indicates that participant did not complete REC
+        if isempty(subDataPath) || ~any(strcmpi(subDataREC(end,:),'ProcDone')) % Indicates that participant did not complete REC
             %        elseif isempty(subDataPath)
             if eSite(1).site == 1 % Initiate error counting
                 eSite(eSite_count).site = Site;
@@ -388,19 +387,7 @@ for sitez = 1:length(sites)
             fprintf('Skipping REC... Site: %s, ID: %s, elapsed_time: %01.0f:%02.0f:%02.2f\n',Site,ID,h,m,s); % Print runtime
             continue;
         end
-        
-%         if exist(fullfile(subDataDir,strcat('NDAR_INV',ID(9:end),'_REC.txt')),'file')
-%             subDataPath = fullfile(subDataDir,strcat('NDAR_INV',ID(9:end),'_REC.txt'));
-%             subDataREC = importSubjDataREC(subDataPath);
-%         end
-        
-        %{
-        Attempt to get MATLAB to read improperly exported data.  Do not
-        uncomment.
-        subData = textscan(subDataPathTest,'%s','delimiter','\n','whitespace','');
-        subData = regexp(testData{2:end,:},',','split');
 
-        %}
         % If file has more than 120 empty cells, it was exported from
         % ePrime.
         if sum(any(cellfun(@isempty,subDataREC))) > 120
@@ -428,7 +415,6 @@ for sitez = 1:length(sites)
         try
             for i = 1:length(Conditions_REC)
                 j = 1;
-                %try %Skip incompatible data
                 while strcmp(subDataREC(1,j),Conditions_REC{i})==false % Loops until it finds the desired condition
                     j = j+1;
                     
@@ -498,22 +484,22 @@ for sitez = 1:length(sites)
         format longg
         
         % Write to outputfile in script directory
-        %fid = fopen(fullfile(scriptDir,['EmoNback_WMBehaviorABCD_',datestr(now,'yyyymmdd'),'.csv']),'a');
         fidREC = fopen(fullfile(outputDir,['EmoNback_RECBehaviorABCD_',dateVar,'.csv']),'a');
         fprintf(fidREC,'\n');
         
         clear ExperimentName NDARGUID
         
         %ExperimentName = subDataREC{2,1}(1:length(subDataREC{2,1}));
-        NDARGUID = subDataREC{2,12};
+        NDARGUID = upper(subDataREC{2,12});
         Version = subDataREC{2,16};
         % Run scripts to create remaining variables
         saveWMStim;
         numstimappearances;
         
-        if any(isnan(checkNAN))
-            continue
-        end
+%         if any(isnan(checkNAN))
+%             continue
+%         end
+
         %analyzeRECBehav;
         ExperimentName = subDataREC{2,1}(1:length(subDataREC{2,1}));
         
@@ -537,7 +523,7 @@ for sitez = 1:length(sites)
         fprintf('Site: %s, ID: %s, elapsed_time: %01.0f:%02.0f:%02.2f\n',Site,ID,h,m,s); % Print runtime
     end
 end
-save(fullfile(pwd,'Output/NBack/WM_Variables'))
+save(fullfile(outputDir,'WM_Variables'))
 %rmpath(scriptDir)
 %cd(scriptDir)e
 [h,m,s] = hms(datetime('now','Format','HH:mm:ss.SS')-t0); % Clock script runtime
