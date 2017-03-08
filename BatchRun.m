@@ -29,17 +29,18 @@ run('loadEPrimeNbackWMBehavABCD_TC3.m')
 
 %% Plots for BJ
 % Create Boxplots for WM
-run('EmoNback_boxplotsWM.m'); % Uncomment to create EmoNback boxplots
+run('EmoNback_boxplotsWMtable.m'); % Uncomment to create EmoNback boxplots
 
 % Create Boxplots for REC
 scriptDir = fullfile(pwd,'EmoNBack/REC_SCRIPTS');
-run('EmoNback_boxplotsREC.m');
+run('EmoNback_boxplotsRECtable.m');
 
 % Save Errors into .mat file for later
 nbackMat = strcat(outputDir,filesep,'NBack_Errors_',datestr(now,'yyyymmdd'));
 save(nbackMat,'eSite')
-clear
 
+close all
+clearvars -except pwdir outDir outputDir outputInd
 %% MID
 
 

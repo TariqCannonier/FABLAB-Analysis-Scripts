@@ -11,7 +11,7 @@ dbstop if error
 if ~exist('dataDir','var')
     % If Executing the script from the subdirectory
     %dataDir = '/Users/tc587/fMRI/ABCD/AWS_Data/aux_incoming_Nov_3rd_2016/';
-    dataDir = '/Users/tc587/fMRI/ABCD/EmotionalNback/ABCDData/data';
+    dataDir = '/Users/tc587/fMRI/ABCD/AWS_Data/aux_incoming_Feb_2017/';
     scriptDir = fullfile(pwd); % Notes the directory for supplemental scripts
     a = regexp(scriptDir,'/');
     outputDir = fullfile(scriptDir(1:a(6)),'Output/NBack',datestr(now,'yyyymmdd'));

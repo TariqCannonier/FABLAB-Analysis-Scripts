@@ -41,7 +41,7 @@ for col=[5,6,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,
     % Converts text in the input cell array to numbers. Replaced non-numeric
     % text with NaN.
     rawData = dataArray{col};
-    for row=1:size(rawData, 1);
+    for row=1:size(rawData, 1)
         % Create a regular expression to detect and remove non-numeric prefixes and
         % suffixes.
         regexstr = '(?<prefix>.*?)(?<numbers>([-]*(\d+[\,]*)+[\.]{0,1}\d*[eEdD]{0,1}[-+]*\d*[i]{0,1})|([-]*(\d+[\,]*)*[\.]{1,1}\d+[eEdD]{0,1}[-+]*\d*[i]{0,1}))(?<suffix>.*)';
@@ -51,15 +51,15 @@ for col=[5,6,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,
             
             % Detected commas in non-thousand locations.
             invalidThousandsSeparator = false;
-            if any(numbers==',');
+            if any(numbers==',')
                 thousandsRegExp = '^\d+?(\,\d{3})*\.{0,1}\d*$';
-                if isempty(regexp(numbers, thousandsRegExp, 'once'));
+                if isempty(regexp(numbers, thousandsRegExp, 'once'))
                     numbers = NaN;
                     invalidThousandsSeparator = true;
                 end
             end
             % Convert numeric text to numbers.
-            if ~invalidThousandsSeparator;
+            if ~invalidThousandsSeparator
                 numbers = textscan(strrep(numbers, ',', ''), '%f');
                 numericData(row, col) = numbers{1};
                 raw{row, col} = numbers{1};
