@@ -150,14 +150,32 @@ for sitez = 1:length(sites)
         subDataMID = subDataMID(~nanInd,:);
         
         % Compute Variables of interest for Output
+        % Overall = run1&2; Combined = Small and Large; 
+        run1Ind = find(table2array(subDataMID(:,'Block'))==1);
+        run2Ind = find(table2array(subDataMID(:,'Block'))==2);
+        rewardInd = ~cellfun('isempty',strfind(table2array(subDataMID(:,'Condition')),'Reward'));
+        punishInd = ~cellfun('isempty',strfind(table2array(subDataMID(:,'Condition')),'Pun'));
+        lgrewardInd = strcmp(table2array(subDataMID(:,'Condition')),'LgReward');
+        smrewardInd = strcmp(table2array(subDataMID(:,'Condition')),'SmallReward');
+        lgpunishInd = strcmp(table2array(subDataMID(:,'Condition')),'LgPun');
+        smpunishInd = strcmp(table2array(subDataMID(:,'Condition')),'SmallPun');
+        neutralInd = strcmp(table2array(subDataMID(:,'Condition')),'Triangle');
+        
         nTrials = length(table2array(subDataMID(:,'SubTrial')));
-        ACCHitRate = sum(table2array(subDataMID(:,'prbacc')))/nTrials;
-        ACCMissRate = sum(~table2array(subDataMID(:,'prbacc')))/nTrials;
-        avgRT = mean(table2array(subDataMID(:,'prbrt')));
-        stdRT = std(table2array(subDataMID(:,'prbrt')));
-        RunMoney = sum(table2array(subDataMID(:,'RunMoney')));
+        OverallMoney = sum(table2array(subDataMID(:,'RunMoney')));
+        OverallCombinedRewardHitRate = sum(table2array(subDataMID(rewardInd,'prbacc')))/nTrials;
+        OverallCombinedRewardMissRate = 1-OverallCombinedRewardHitRate;
+        OverallCombinedRewardMeanRT = mean(table2array(subDataMID(rewardInd,'prbrt')));
+        OverallCombinedRewardRT_Std = std(table2array(subDataMID(rewardInd,'prbrt')));
+        OverallCombinedLossHitRate = sum(table2array(subDataMID(punishInd,'prbacc')))/nTrials;
+        OverallCombinedLossMissRate = 1-OverallCombinedLossHitRate;
+        OverallCombinedLossMeanRT = mean(table2array(subDataMID(punishInd,'prbrt')));
+        OverallCombinedLossRT_Std = std(table2array(subDataMID(punishInd,'prbrt')));
+        OverallSmallRewardHitRate
         
         printVar = {Site,ID,ExperimentName,Version};
+        
+        
         % printVars to textfile
         for i = 1:length(printVars)
             if ischar(printVars{i})

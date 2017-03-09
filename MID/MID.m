@@ -150,14 +150,109 @@ for sitez = 1:length(sites)
         subDataMID = subDataMID(~nanInd,:);
         
         % Compute Variables of interest for Output
+        % Overall = run1&2; Combined = Small and Large; 
+        run1Ind = find(table2array(subDataMID(:,'Block'))==1);
+        run2Ind = find(table2array(subDataMID(:,'Block'))==2);
+        rewardInd = ~cellfun('isempty',strfind(table2array(subDataMID(:,'Condition')),'Reward'));
+        punishInd = ~cellfun('isempty',strfind(table2array(subDataMID(:,'Condition')),'Pun'));
+        lgrewardInd = strcmp(table2array(subDataMID(:,'Condition')),'LgReward');
+        smrewardInd = strcmp(table2array(subDataMID(:,'Condition')),'SmallReward');
+        lgpunishInd = strcmp(table2array(subDataMID(:,'Condition')),'LgPun');
+        smpunishInd = strcmp(table2array(subDataMID(:,'Condition')),'SmallPun');
+        neutralInd = strcmp(table2array(subDataMID(:,'Condition')),'Triangle');
+        
         nTrials = length(table2array(subDataMID(:,'SubTrial')));
-        ACCHitRate = sum(table2array(subDataMID(:,'prbacc')))/nTrials;
-        ACCMissRate = sum(~table2array(subDataMID(:,'prbacc')))/nTrials;
-        avgRT = mean(table2array(subDataMID(:,'prbrt')));
-        stdRT = std(table2array(subDataMID(:,'prbrt')));
-        RunMoney = sum(table2array(subDataMID(:,'RunMoney')));
+        OverallMoney = sum(table2array(subDataMID(:,'RunMoney')));
+        OverallCombinedRewardHitRate = sum(table2array(subDataMID(rewardInd,'prbacc')))/nTrials;
+        OverallCombinedRewardMissRate = 1-OverallCombinedRewardHitRate;
+        OverallCombinedRewardMeanRT = mean(table2array(subDataMID(rewardInd,'prbrt')));
+        OverallCombinedRewardRT_Std = std(table2array(subDataMID(rewardInd,'prbrt')));
+        OverallCombinedLossHitRate = sum(table2array(subDataMID(punishInd,'prbacc')))/nTrials;
+        OverallCombinedLossMissRate = 1-OverallCombinedLossHitRate;
+        OverallCombinedLossMeanRT = mean(table2array(subDataMID(punishInd,'prbrt')));
+        OverallCombinedLossRT_Std = std(table2array(subDataMID(punishInd,'prbrt')));
+        OverallSmallRewardHitRate = sum(table2array(subDataMID(smrewardInd,'prbacc')))/nTrials;
+        OverallSmallRewardMissRate	= 1-OverallSmallRewardHitRate;
+        OverallSmallRewardMeanRT = mean(table2array(subDataMID(smrewardInd,'prbrt')));
+        OverallSmallRewardRT_Std = std(table2array(subDataMID(smrewardInd,'prbrt')));
+        OverallLargeRewardHitRate	
+        OverallLargeRewardMissRate	
+        OverallLargeRewardMeanRT	
+        OverallLargeRewardRT_Std	
+        OverallSmallLossHitRate	
+        OverallSmallLossMissRate	
+        OverallSmallLossMeanRT	
+        OverallSmallLossRT_Std	
+        OverallLargeLossHitRate	
+        OverallLargeLossMissRate	
+        OverallLargeLossMeanRT	
+        OverallLargeLossRT_Std	
+        OverallNeutralHitRate	
+        OverallNeutralMissRate	
+        OverallNeutralMeanRT	
+        OverallNeutralRT_Std	
+        run1Money	
+        run1CombinedRewardHitRate	
+        run1CombinedRewardMissRate	
+        run1CombinedRewardMeanRT	
+        run1CombinedRewardRT_Std	
+        run1CombinedLossHitRate	
+        run1CombinedLossMissRate	
+        run1CombinedLossMeanRT	
+        run1CombinedLossRT_Std	
+        run1SmallRewardHitRate	
+        run1SmallRewardMissRate	
+        run1SmallRewardMeanRT	
+        run1SmallRewardRT_Std	
+        run1LargeRewardHitRate	
+        run1LargeRewardMissRate	
+        run1LargeRewardMeanRT	
+        run1LargeRewardRT_Std	
+        run1SmallLossHitRate	
+        run1SmallLossMissRate	
+        run1SmallLossMeanRT	
+        run1SmallLossRT_Std	
+        run1LargeLossHitRate	
+        run1LargeLossMissRate	
+        run1LargeLossMeanRT	
+        run1LargeLossRT_Std	
+        run1NeutralHitRate	
+        run1NeutralMissRate	
+        run1NeutralMeanRT	
+        run1NeutralRT_Std	
+        run2Money	
+        run2CombinedRewardHitRate	
+        run2CombinedRewardMissRate	
+        run2CombinedRewardMeanRT	
+        run2CombinedRewardRT_Std	
+        run2CombinedLossHitRate	
+        run2CombinedLossMissRate	
+        run2CombinedLossMeanRT	
+        run2CombinedLossRT_Std	
+        run2SmallRewardHitRate	
+        run2SmallRewardMissRate	
+        run2SmallRewardMeanRT	
+        run2SmallRewardRT_Std	
+        run2LargeRewardHitRate	
+        run2LargeRewardMissRate	
+        run2LargeRewardMeanRT	
+        run2LargeRewardRT_Std	
+        run2SmallLossHitRate	
+        run2SmallLossMissRate	
+        run2SmallLossMeanRT	
+        run2SmallLossRT_Std	
+        run2LargeLossHitRate	
+        run2LargeLossMissRate	
+        run2LargeLossMeanRT	
+        run2LargeLossRT_Std	
+        run2NeutralHitRate	
+        run2NeutralMissRate	
+        run2NeutralMeanRT =
+        run2NeutralRT_Std
         
         printVar = {Site,ID,ExperimentName,Version};
+        
+        
         % printVars to textfile
         for i = 1:length(printVars)
             if ischar(printVars{i})
@@ -173,6 +268,11 @@ for sitez = 1:length(sites)
 end
 
         
+
+
+
+
+
 
 
 
