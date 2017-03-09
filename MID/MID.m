@@ -26,8 +26,8 @@ end
 fidMID = fopen(fullfile(outputDir,['MIDBehaviorMID_',dateVar,'.csv']),'w');
 
 % List output variables
-%{
-condsMID = {'Site','Subject','SubjectFileName','ExperimentName','Version',...
+%
+condsMID = {'Site','Subject','ExperimentName','Version',...
     'OverallMoney','OverallCombinedRewardHitRate','OverallCombinedRewardMissRate',...
     'OverallCombinedRewardMeanRT','OverallCombinedRewardRT_Std','OverallCombinedLossHitRate',...
     'OverallCombinedLossMissRate','OverallCombinedLossMeanRT','OverallCombinedLossRT_Std',...
@@ -68,7 +68,7 @@ for i = 1:length(condsMID)
 end
 
 % Close csv file
-fclose(fidMID);
+%fclose(fidMID);
 
 %% Navigating dat directories
 % Pull directories names for each site
@@ -127,28 +127,51 @@ for sitez = 1:length(sites)
         
         % Generate the participant's data directory
         subDataDir = fullfile(subBaseDir,x(ct).name);
-        
-        subDataMID = 1;
+        subDataMID = cell2table(cell(0,5));
         subDataFile = dir(subDataDir);
         subDataFile = subDataFile(arrayfun(@(x)x.name(1),subDataFile)~='.');
         
         i = 1;
-        while strcmp(subDataMID(1),'ExperimentName')==false && i<=length(subDataFile)
+        
+        % Find the participant's MID data and import the data to a variable
+        while isempty(subDataMID) || strcmp(table2array(subDataMID(1,1)),'ExperimentName')==false && i<=length(subDataFile)
             subDataPath = [];
             if strfind(subDataFile(i).name,[shortID,'_MID'])
                 subDataPath = fullfile(subDataFile(i).folder,subDataFile(i).name);
-                subDataMID = importSubjDataMID(subDataPath);
+                subDataMID = importSubjDataMIDtable(subDataPath);
             end
             i = i+1;
         end
         
-        % Columns of interest for performance Data
-        Conditions_REC = {'Block','SubTrial','Condition','prbacc','prbrt','RunMoney'};
+        % Columns of interest for performance Data. Cut NaN entries from
+        % variable.
+        Conditions_MID = {'Block','SubTrial','Condition','prbacc','prbrt','RunMoney'};
+        nanInd = isnan(table2array(subDataMID(:,'prbacc')));
+        subDataMID = subDataMID(~nanInd,:);
         
-        % Loop through Participant File
+        % Compute Variables of interest for Output
+        nTrials = length(table2array(subDataMID(:,'SubTrial')));
+        ACCHitRate = sum(table2array(subDataMID(:,'prbacc')))/nTrials;
+        ACCMissRate = sum(~table2array(subDataMID(:,'prbacc')))/nTrials;
+        avgRT = mean(table2array(subDataMID(:,'prbrt')));
+        stdRT = std(table2array(subDataMID(:,'prbrt')));
+        RunMoney = sum(table2array(subDataMID(:,'RunMoney')));
         
+        printVar = {Site,ID,ExperimentName,Version};
+        % printVars to textfile
+        for i = 1:length(printVars)
+            if ischar(printVars{i})
+                printType = '%s';
+            elseif isa(printVars{i},'double')
+                printType = '%d';
+            end
+            fprintf(fidMID,[printType ','],printVars{i})
+        end
+        fprintf(fidMID,'\n')
         
-        
+    end
+end
+
         
 
 
