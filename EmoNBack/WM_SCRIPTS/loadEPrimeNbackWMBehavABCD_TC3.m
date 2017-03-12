@@ -355,11 +355,18 @@ for sitez = 1:length(sites)
         subDataFile = subDataFile(arrayfun(@(x)x.name(1),subDataFile)~='.');
 
         i = 1;
+        web = false;
         while strcmp(subDataREC(1),'ExperimentName')==false && i<=length(subDataFile)
             subDataPath = [];
             if strfind(subDataFile(i).name,[shortID,'_REC']) % If data file matches shortID and is REC
+                if strfind(subDataFile(i).name,[shortID,'_RECWEB']) % If data file matches shortID and is REC
+                    subDataPath = fullfile(subDataFile(i).folder,subDataFile(i).name);
+                    subDataREC = importSubjDataRECWEB(subDataPath);
+                    web = true;
+                else
                 subDataPath = fullfile(subDataFile(i).folder,subDataFile(i).name);
                 subDataREC = importSubjDataREC(subDataPath);
+                end
             end
             i = i+1;
         end
@@ -490,8 +497,15 @@ for sitez = 1:length(sites)
         clear ExperimentName NDARGUID
         
         %ExperimentName = subDataREC{2,1}(1:length(subDataREC{2,1}));
-        NDARGUID = upper(subDataREC{2,12});
-        Version = subDataREC{2,16};
+        if web == true
+            NDARGUID = upper(subDataREC{2,7});
+            Version = subDataREC{2,8};
+            ExperimentName = 'Emo_Nback_RecMem_Online_2017';
+        else
+            NDARGUID = upper(subDataREC{2,12});
+            Version = subDataREC{2,16};
+            ExperimentName = subDataREC{2,1}(1:length(subDataREC{2,1}));
+        end
         % Run scripts to create remaining variables
         saveWMStim;
         numstimappearances;
@@ -501,7 +515,7 @@ for sitez = 1:length(sites)
 %         end
 
         %analyzeRECBehav;
-        ExperimentName = subDataREC{2,1}(1:length(subDataREC{2,1}));
+
         
         % Define variable type e.g. character, numberic cell
         % if numeric, specify digits to print
