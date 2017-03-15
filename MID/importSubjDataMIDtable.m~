@@ -95,7 +95,7 @@ rawNumericColumns(R) = {NaN}; % Replace non-numeric cells
 
 %% Create output variable
 HYAENE6MID = table;
-for i = 1:size(rawCellColumns,2)
+for i = 1:size(rawCellColumns,1)
     if strfind(rawCellColumns{1,i},'.')
         a = strfind(rawCellColumns{1,i},'.');
         rawCellColumns{1,i}(a)='_';
@@ -112,23 +112,19 @@ for i = 1:size(rawCellColumns,2)
     i
 end
 
-% Place MID Columns names for Numeric Columns here...
-numericNames = {'PracticeRT','RandomSeed','Block','BlockList','BlockListCycle',...
-    };
-
-for i = 1:size(rawNumericColumns,2)
-    if strfind(rawNumericColumns{1,i},'.')
-        a = strfind(rawNumericColumns{1,i},'.');
-        rawNumericColumns{1,i}(a)='_';
-    elseif strfind(rawNumericColumns{1,i},'[')
-        a = strfind(rawNumericColumns{1,i},'[');
-        rawNumericColumns{1,i}(a) = '_';
-        if strfind(rawNumericColumns{1,i},']')
-            a = strfind(rawNumericColumns{1,i},']');
-            rawNumericColumns{1,i}(a) = '';
+for i = 1:size(rawNumericColumns,1)
+        if strfind(rawCellColumns{1,i},'.')
+        a = strfind(rawCellColumns{1,i},'.');
+        rawCellColumns{1,i}(a)='_';
+    elseif strfind(rawCellColumns{1,i},'[')
+        a = strfind(rawCellColumns{1,i},'[');
+        rawCellColumns{1,i}(a) = '_';
+        if strfind(rawCellColumns{1,i},']')
+            a = strfind(rawCellColumns{1,i},']');
+            rawCellColumns{1,i}(a) = '';
         end
     end
-    eval(sprintf('HYAENE6MID.%s = cell2mat(rawNumericColumns(:,%d));',rawNumericColumns{1,i},i));
+    eval(sprintf('HYAENE6MID.%s = cell2mat(rawNumericColumns(:,%d));',rawCellColumns{1,i},i));
     clear a;
     i
 end

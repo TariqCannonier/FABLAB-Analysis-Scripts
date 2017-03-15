@@ -1,11 +1,13 @@
 
 dbstop if error
 % Create string for MID
+Home = getenv('HOME');
 if ~exist('dataDir','var')
-    dataDir = '/Users/tc587/fMRI/ABCD/AWS_Data/aux_incoming_Feb_2017/';
+    dataDir = uigetdir;
+%    dataDir = '/Users/tc587/fMRI/ABCD/AWS_Data/aux_incoming_Feb_2017/';
     scriptDir = fullfile(pwd);
     a = regexp(scriptDir,'/');
-    outputDir = fullfile(scriptDir(1:a(end)),'Output/MID',datestr(now,'yyyymmdd'));
+    outputDir = fullfile(scriptDir(1:a(end-1)),'Output/MID',datestr(now,'yyyymmdd'));
 end
 
 EventName = 'baseline_year_1_arm_1';
@@ -21,7 +23,7 @@ if ~exist(outputDir,'dir')
     mkdir(outputDir);
 end
 
-%%
+%% Open MID Output File with Header Labels
 % open MID Behavior file
 fidMID = fopen(fullfile(outputDir,['MIDBehavior_',dateVar,'.csv']),'w');
 
@@ -67,7 +69,7 @@ for i = 1:length(condsMID)
 end
 fprintf(fidMID,'\n');
 
-%% Navigating dat directories
+%% Navigating data directories
 % Pull directories names for each site
 sites = dir(dataDir);
 sites = sites(arrayfun(@(x)x.name(1),sites) ~='.'); % Removes any hidden directories with '.' in name
@@ -140,11 +142,13 @@ for sitez = 1:length(sites)
             end
             
             if isempty(subDataMID) % Skip forward if subDataMID isempty
+                [h,m,s] = hms(datetime('now','Format','HH:mm:ss.SS')-t0); % Clock script runtime
+                fprintf('Skipping MID... Site: %s, ID: %s, elapsed_time: %01.0f:%02.0f:%02.2f\n',Site,ID,h,m,s); % Print runtime
                 continue;
             end
             
-            if ~strcmpi(table2array(subDataMID(1,'MIDVERSION')),'MIDVERSION')
-                subDataMID = importSubjDataMID13table(subDataPath); % Use version 1-12
+            if cell2mat(strfind(table2array(subDataMID(1,:)),'TrialOrder')) %~strcmpi(table2array(subDataMID(1,'MIDVERSION')),'MIDVERSION')
+                %subDataMID = importSubjDataMID13table(subDataPath); % Use version 1-12
                 version = table2array(subDataMID(2,'TrialOrder'));
             else
                 version = table2array(subDataMID(2,'MIDVERSION'));
@@ -276,6 +280,10 @@ for sitez = 1:length(sites)
             run2NeutralMissRate = 1-run2NeutralHitRate;
             run2NeutralMeanRT = mean(table2array(subDataMID(neutralInd(51:end),'prbrt')));
             run2NeutralRT_Std = std(table2array(subDataMID(neutralInd(51:end),'prbrt')));
+            
+            if isnan(OverallCombinedRewardMeanRT)
+                1;
+            end
             
             printVars = {Site,ID,table2array(subDataMID(2,'ExperimentName')),version,OverallMoney,...
                 OverallCombinedRewardHitRate, OverallCombinedRewardMissRate,...

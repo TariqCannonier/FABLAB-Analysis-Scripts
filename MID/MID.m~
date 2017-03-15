@@ -1,11 +1,13 @@
 
 dbstop if error
-% Create string for MID_
+% Create string for MID
+Home = getenv('HOME');
 if ~exist('dataDir','var')
-    dataDir = '/Users/tc587/fMRI/ABCD/AWS_Data/aux_incoming_Feb_2017/';
+    dataDir = uigetdir;
+%    dataDir = '/Users/tc587/fMRI/ABCD/AWS_Data/aux_incoming_Feb_2017/';
     scriptDir = fullfile(pwd);
     a = regexp(scriptDir,'/');
-    outputDir = fullfile(scriptDir(1:a(end)),'Output/MID',datestr(now,'yyyymmdd'));
+    outputDir = fullfile(scriptDir(1:a(end-1)),'Output/MID',datestr(now,'yyyymmdd'));
 end
 
 EventName = 'baseline_year_1_arm_1';
@@ -21,12 +23,11 @@ if ~exist(outputDir,'dir')
     mkdir(outputDir);
 end
 
-%%
+%% Open MID Output File with Header Labels
 % open MID Behavior file
 fidMID = fopen(fullfile(outputDir,['MIDBehavior_',dateVar,'.csv']),'w');
 
 % List output variables
-%
 condsMID = {'Site','Subject','ExperimentName','Version',...
     'OverallMoney','OverallCombinedRewardHitRate','OverallCombinedRewardMissRate',...
     'OverallCombinedRewardMeanRT','OverallCombinedRewardRT_Std','OverallCombinedLossHitRate',...
@@ -68,10 +69,7 @@ for i = 1:length(condsMID)
 end
 fprintf(fidMID,'\n');
 
-% Close csv file
-%fclose(fidMID);
-
-%% Navigating dat directories
+%% Navigating data directories
 % Pull directories names for each site
 sites = dir(dataDir);
 sites = sites(arrayfun(@(x)x.name(1),sites) ~='.'); % Removes any hidden directories with '.' in name
@@ -123,7 +121,6 @@ for sitez = 1:length(sites)
             [h,m,s] = hms(datetime('now','Format','HH:mm:ss.SS')-t0); % Clock script runtime
             fprintf('Skipping MID... Site: %s, ID: %s, elapsed_time: %01.0f:%02.0f:%02.2f\n',Site,ID,h,m,s); % Print runtime
             continue
-            %break
         end
         
         % Generate the participant's data directory
@@ -131,32 +128,34 @@ for sitez = 1:length(sites)
         subDataMID = cell2table(cell(0,5));
         subDataFile = dir(subDataDir);
         subDataFile = subDataFile(arrayfun(@(x)x.name(1),subDataFile)~='.');
-        
         i = 1;
         
         % Find the participant's MID data and import the data to a variable
-        while (isempty(subDataMID) || strcmp(table2array(subDataMID(1,1)),'ExperimentName')==false) && i<=length(subDataFile)
-            subDataPath = [];
-            if strfind(subDataFile(i).name,[shortID,'_MID'])
-                subDataPath = fullfile(subDataFile(i).folder,subDataFile(i).name);
-                subDataMID = importSubjDataMIDtable(subDataPath); % Use version 13
-            end
-            i = i+1;
-        end
-        
-        if isempty(subDataMID) % Skip forward if subDataMID isempty
-            continue;
-        end
-        
-        if ~strcmpi(table2array(subDataMID(1,'MIDVERSION')),'MIDVERSION')
-            subDataMID = importSubjDataMID13table(subDataPath); % Use version 1-12
-            version = table2array(subDataMID(2,'TrialOrder'));
-        else
-            version = table2array(subDataMID(2,'MIDVERSION'));
-        end
-        % Columns of interest for performance Data. Cut NaN entries from
-        % variable.
         try
+            while (isempty(subDataMID) || strcmp(table2array(subDataMID(1,1)),'ExperimentName')==false) && i<=length(subDataFile)
+                subDataPath = [];
+                if strfind(subDataFile(i).name,[shortID,'_MID'])
+                    subDataPath = fullfile(subDataFile(i).folder,subDataFile(i).name);
+                    subDataMID = importSubjDataMIDtable(subDataPath); % Use version 13
+                end
+                i = i+1;
+            end
+            
+            if isempty(subDataMID) % Skip forward if subDataMID isempty
+                [h,m,s] = hms(datetime('now','Format','HH:mm:ss.SS')-t0); % Clock script runtime
+                fprintf('Skipping MID... Site: %s, ID: %s, elapsed_time: %01.0f:%02.0f:%02.2f\n',Site,ID,h,m,s); % Print runtime
+                continue;
+            end
+            
+            if strfind(table2array(subDataMID(1,:)),'MIDVERSION') %~strcmpi(table2array(subDataMID(1,'MIDVERSION')),'MIDVERSION')
+                %subDataMID = importSubjDataMID13table(subDataPath); % Use version 1-12
+                version = table2array(subDataMID(2,'TrialOrder'));
+            else
+                version = table2array(subDataMID(2,'MIDVERSION'));
+            end
+            
+            % Columns of interest for performance Data. Cut NaN entries from
+            % variable.
             Conditions_MID = {'Block','SubTrial','Condition','prbacc','prbrt','RunMoney'};
             nanInd = isnan(table2array(subDataMID(:,'prbacc')));
             subDataMID = subDataMID(~nanInd,:);
@@ -282,6 +281,10 @@ for sitez = 1:length(sites)
             run2NeutralMeanRT = mean(table2array(subDataMID(neutralInd(51:end),'prbrt')));
             run2NeutralRT_Std = std(table2array(subDataMID(neutralInd(51:end),'prbrt')));
             
+            if isnan(OverallCombinedRewardMeanRT)
+                1;
+            end
+            
             printVars = {Site,ID,table2array(subDataMID(2,'ExperimentName')),version,OverallMoney,...
                 OverallCombinedRewardHitRate, OverallCombinedRewardMissRate,...
                 OverallCombinedRewardMeanRT, OverallCombinedRewardRT_Std,...
@@ -349,9 +352,9 @@ for sitez = 1:length(sites)
             fprintf(fidMID,[printType ','],printIt);
         end
         fprintf(fidMID,'\n');
-            fprintf('Site: %s, ID: %s, elapsed_time: %01.0f:%02.0f:%02.2f\n',Site,ID,h,m,s); % Print runtime
+        [h,m,s] = hms(datetime('now','Format','HH:mm:ss.SS')-t0); % Clock script runtime
+        fprintf('Site: %s, ID: %s, elapsed_time: %01.0f:%02.0f:%02.2f\n',Site,ID,h,m,s); % Print runtime
         clear subDataMID
-        
     end
 end
 
