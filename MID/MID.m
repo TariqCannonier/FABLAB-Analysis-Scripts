@@ -136,7 +136,8 @@ for sitez = 1:length(sites)
                 subDataPath = [];
                 if strfind(subDataFile(i).name,[shortID,'_MID'])
                     subDataPath = fullfile(subDataFile(i).folder,subDataFile(i).name);
-                    subDataMID = importSubjDataMIDtable(subDataPath); % Use version 13
+                    %subDataMID = importSubjDataMIDtable(subDataPath); % Use version 13
+                    subDataMID = importSubjDataMIDtable1(subDataPath);
                 end
                 i = i+1;
             end
