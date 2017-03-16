@@ -147,10 +147,10 @@ for sitez = 1:length(sites)
                 continue;
             end
             
-            if cell2mat(strfind(table2array(subDataMID(1,:)),'TrialOrder')) %~strcmpi(table2array(subDataMID(1,'MIDVERSION')),'MIDVERSION')
+            try %cell2mat(strfind(table2array(subDataMID(1,:)),'TrialOrder')) %~strcmpi(table2array(subDataMID(1,'MIDVERSION')),'MIDVERSION')
                 %subDataMID = importSubjDataMID13table(subDataPath); % Use version 1-12
                 version = table2array(subDataMID(2,'TrialOrder'));
-            else
+            catch
                 version = table2array(subDataMID(2,'MIDVERSION'));
             end
             
