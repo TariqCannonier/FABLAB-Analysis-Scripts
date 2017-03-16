@@ -77,7 +77,7 @@ sites = dir(dataDir);
 sites = sites(arrayfun(@(x)x.name(1),sites) ~='.'); % Removes any hidden directories with '.' in name
 sites = {sites.name}';
 
-for sitez = 4:length(sites) % Change back to 1 to start from top of cohort.  Change for debugging.
+for sitez = 1:length(sites) % Change back to 1 to start from top of cohort.  Change for debugging.
     Site = sites{sitez};
     siteDir = fullfile(dataDir,Site);
     
