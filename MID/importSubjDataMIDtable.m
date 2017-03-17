@@ -1,7 +1,7 @@
 function HYAENE6MID = importSubjDataMIDtable(filename, startRow, endRow)
 %IMPORTFILE Import numeric data from a text file as a matrix.
 %   HYAENE6MID = IMPORTFILE(FILENAME) Reads data from text file FILENAME
-%   for the default selection.  Used for the 13th Trial Order.
+%   for the default selection.
 %
 %   HYAENE6MID = IMPORTFILE(FILENAME, STARTROW, ENDROW) Reads data from
 %   rows STARTROW through ENDROW of text file FILENAME.
@@ -95,77 +95,6 @@ rawNumericColumns(R) = {NaN}; % Replace non-numeric cells
 
 %% Create output variable
 HYAENE6MID = table;
-for i = 1:size(rawCellColumns,2)
-    if strfind(rawCellColumns{1,i},'.')
-        a = strfind(rawCellColumns{1,i},'.');
-        rawCellColumns{1,i}(a)='_';
-    elseif strfind(rawCellColumns{1,i},'[')
-        a = strfind(rawCellColumns{1,i},'[');
-        rawCellColumns{1,i}(a) = '_';
-        if strfind(rawCellColumns{1,i},']')
-            a = strfind(rawCellColumns{1,i},']');
-            rawCellColumns{1,i}(a) = '';
-        end
-    end
-    eval(sprintf('HYAENE6MID.%s = rawCellColumns(:,%d);',rawCellColumns{1,i},i));
-    clear a;
-%    i
-end
-
-% Place MID Columns names for Numeric Columns here...
-numericNames = {'PracticeRT','RandomSeed','Block','BlockList','BlockListCycle',...
-    'BlockListSample','BlockTitle','EndFixDuration','EndFixDurationError',...
-    'EndFixFinishTime','EndFixOffsetDelay','EndFixOffsetTime',...
-    'EndFixOnsetDelay','EndFixOnsetTime','EndFixOnsetToOnsetTime',...
-    'EndFixStartTime','ListName','Trial','GetReadyRTTime','PeriodList',...
-    'PeriodListCycle','PeriodListSample','PrepTimeDuration',...
-    'PrepTimeDurationError','PrepTimeFinishTime','PrepTimeOffsetDelay',...
-    'PrepTimeOffsetTime','PrepTimeOnsetDelay','PrepTimeOnsetTime',...
-    'PrepTimeOnsetToOnsetTime','PrepTimeStartTime','SiemensPadOffsetDelay',...
-    'SiemensPadOffsetTime','SiemensPadOnsetDelay','SiemensPadOnsetTime',...
-    'SiemensPadOnsetToOnsetTime','SiemensPadRTTime','Waiting4Scanner',...
-    'Waiting4ScannerCycle','Waiting4ScannerSample','SubTrial',...
-    'AnticipationDuration','AnticipationDurationError',...
-    'AnticipationFinishTime','AnticipationOffsetDelay',...
-    'AnticipationOffsetTime','AnticipationOnsetDelay',...
-    'AnticipationOnsetTime','AnticipationOnsetToOnsetTime',...
-    'AnticipationStartTime','AnticipationDuration1','CueCustomOnsetTime',...
-    'CueDuration','CueDurationError','CueFinishTime','CueOffsetDelay',...
-    'CueOffsetTime','CueOnsetDelay','CueOnsetTime','CueOnsetToOnsetTime',...
-    'CueStartTime','FeedbackDuration','FeedbackDurationError',...
-    'FeedbackFinishTime','FeedbackOffsetDelay','FeedbackOffsetTime',...
-    'FeedbackOnsetDelay','FeedbackOnsetTime','FeedbackOnsetToOnsetTime',...
-    'FeedbackStartTime','FeedbackDuration1','meanrt','moneyamt',...
-    'percentacc','prbacc','prbresp','prbrt','Probe','ProbeDuration',...
-    'ProbeDurationError','ProbeFinishTime','ProbeOffsetDelay',...
-    'ProbeOffsetTime','ProbeOnsetDelay','ProbeOnsetTime',...
-    'ProbeOnsetToOnsetTime','ProbeRESP','ProbeRT','ProbeRTTime',...
-    'ProbeStartTime','ProbeTime','ProcedureSubTrial','ResponseCheck',...
-    'Result','RunList','RunListCycle','RunListSample','RunMoney',...
-    'RunningSubTrial','TextDisplay1Duration','TextDisplay1DurationError',...
-    'TextDisplay1FinishTime','TextDisplay1OffsetDelay',...
-    'TextDisplay1OffsetTime','TextDisplay1OnsetDelay',...
-    'TextDisplay1OnsetTime','TextDisplay1OnsetToOnsetTime',...
-    'TextDisplay1StartTime','TimeVersion3','TimeVersion5'
-    };
-
-for i = 1:size(rawNumericColumns,2)
-    if strfind(rawNumericColumns{1,i},'.')
-        a = strfind(rawNumericColumns{1,i},'.');
-        rawNumericColumns{1,i}(a)='_';
-    elseif strfind(rawNumericColumns{1,i},'[')
-        a = strfind(rawNumericColumns{1,i},'[');
-        rawNumericColumns{1,i}(a) = '_';
-        if strfind(rawNumericColumns{1,i},']')
-            a = strfind(rawNumericColumns{1,i},']');
-            rawNumericColumns{1,i}(a) = '';
-        end
-    end
-    eval(sprintf('HYAENE6MID.%s = cell2mat(rawNumericColumns(:,%d));',numericNames{i},i));
-    clear a;
-    i
-end
-%{
 HYAENE6MID.ExperimentName = rawCellColumns(:, 1);
 HYAENE6MID.Subject = rawCellColumns(:, 2);
 HYAENE6MID.Session = rawCellColumns(:, 3);
@@ -179,10 +108,8 @@ HYAENE6MID.Handedness = rawCellColumns(:, 10);
 HYAENE6MID.ImgPath = rawCellColumns(:, 11);
 HYAENE6MID.MIDVERSION = rawCellColumns(:, 12);
 HYAENE6MID.NARGUID = rawCellColumns(:, 13);
-    
 HYAENE6MID.PracticeRT = cell2mat(rawNumericColumns(:, 1));
 HYAENE6MID.RandomSeed = cell2mat(rawNumericColumns(:, 2));
-    
 HYAENE6MID.RuntimeCapabilities = rawCellColumns(:, 14);
 HYAENE6MID.RuntimeVersion = rawCellColumns(:, 15);
 HYAENE6MID.RuntimeVersionExpected = rawCellColumns(:, 16);
@@ -191,7 +118,6 @@ HYAENE6MID.SessionStartDateTimeUtc = rawCellColumns(:, 18);
 HYAENE6MID.SessionTime = rawCellColumns(:, 19);
 HYAENE6MID.StudioVersion = rawCellColumns(:, 20);
 HYAENE6MID.triggercode = rawCellColumns(:, 21);
-
 HYAENE6MID.Block = cell2mat(rawNumericColumns(:, 3));
 HYAENE6MID.BlockList = cell2mat(rawNumericColumns(:, 4));
 HYAENE6MID.BlockListCycle = cell2mat(rawNumericColumns(:, 5));
@@ -207,10 +133,8 @@ HYAENE6MID.EndFixOnsetTime = cell2mat(rawNumericColumns(:, 14));
 HYAENE6MID.EndFixOnsetToOnsetTime = cell2mat(rawNumericColumns(:, 15));
 HYAENE6MID.EndFixStartTime = cell2mat(rawNumericColumns(:, 16));
 HYAENE6MID.ListName = cell2mat(rawNumericColumns(:, 17));
-
 HYAENE6MID.ProcedureBlock = rawCellColumns(:, 22);
 HYAENE6MID.RunningBlock = rawCellColumns(:, 23);
-
 HYAENE6MID.Trial = cell2mat(rawNumericColumns(:, 18));
 HYAENE6MID.GetReadyRTTime = cell2mat(rawNumericColumns(:, 19));
 HYAENE6MID.PeriodList = cell2mat(rawNumericColumns(:, 20));
@@ -225,10 +149,8 @@ HYAENE6MID.PrepTimeOnsetDelay = cell2mat(rawNumericColumns(:, 28));
 HYAENE6MID.PrepTimeOnsetTime = cell2mat(rawNumericColumns(:, 29));
 HYAENE6MID.PrepTimeOnsetToOnsetTime = cell2mat(rawNumericColumns(:, 30));
 HYAENE6MID.PrepTimeStartTime = cell2mat(rawNumericColumns(:, 31));
-
 HYAENE6MID.ProcedureTrial = rawCellColumns(:, 24);
 HYAENE6MID.RunningTrial = rawCellColumns(:, 25);
-
 HYAENE6MID.SiemensPadOffsetDelay = cell2mat(rawNumericColumns(:, 32));
 HYAENE6MID.SiemensPadOffsetTime = cell2mat(rawNumericColumns(:, 33));
 HYAENE6MID.SiemensPadOnsetDelay = cell2mat(rawNumericColumns(:, 34));
@@ -249,10 +171,8 @@ HYAENE6MID.AnticipationOnsetTime = cell2mat(rawNumericColumns(:, 48));
 HYAENE6MID.AnticipationOnsetToOnsetTime = cell2mat(rawNumericColumns(:, 49));
 HYAENE6MID.AnticipationStartTime = cell2mat(rawNumericColumns(:, 50));
 HYAENE6MID.AnticipationDuration1 = cell2mat(rawNumericColumns(:, 51));
-
 HYAENE6MID.Condition = rawCellColumns(:, 26);
 HYAENE6MID.Cue = rawCellColumns(:, 27);
-
 HYAENE6MID.CueCustomOnsetTime = cell2mat(rawNumericColumns(:, 52));
 HYAENE6MID.CueDuration = cell2mat(rawNumericColumns(:, 53));
 HYAENE6MID.CueDurationError = cell2mat(rawNumericColumns(:, 54));
@@ -279,7 +199,6 @@ HYAENE6MID.percentacc = cell2mat(rawNumericColumns(:, 74));
 HYAENE6MID.prbacc = cell2mat(rawNumericColumns(:, 75));
 HYAENE6MID.prbresp = cell2mat(rawNumericColumns(:, 76));
 HYAENE6MID.prbrt = cell2mat(rawNumericColumns(:, 77));
-
 HYAENE6MID.Probe = cell2mat(rawNumericColumns(:, 78));
 HYAENE6MID.ProbeDuration = cell2mat(rawNumericColumns(:, 79));
 HYAENE6MID.ProbeDurationError = cell2mat(rawNumericColumns(:, 80));
@@ -304,7 +223,6 @@ HYAENE6MID.RunMoney = cell2mat(rawNumericColumns(:, 98));
 HYAENE6MID.RunningSubTrial = cell2mat(rawNumericColumns(:, 99));
 HYAENE6MID.TextDisplay1Duration = cell2mat(rawNumericColumns(:, 100));
 HYAENE6MID.TextDisplay1DurationError = cell2mat(rawNumericColumns(:, 101));
-
 HYAENE6MID.TextDisplay1FinishTime = cell2mat(rawNumericColumns(:, 102));
 HYAENE6MID.TextDisplay1OffsetDelay = cell2mat(rawNumericColumns(:, 103));
 HYAENE6MID.TextDisplay1OffsetTime = cell2mat(rawNumericColumns(:, 104));
@@ -314,5 +232,4 @@ HYAENE6MID.TextDisplay1OnsetToOnsetTime = cell2mat(rawNumericColumns(:, 107));
 HYAENE6MID.TextDisplay1StartTime = cell2mat(rawNumericColumns(:, 108));
 HYAENE6MID.TimeVersion3 = cell2mat(rawNumericColumns(:, 109));
 HYAENE6MID.TimeVersion5 = cell2mat(rawNumericColumns(:, 110));
-%}
 

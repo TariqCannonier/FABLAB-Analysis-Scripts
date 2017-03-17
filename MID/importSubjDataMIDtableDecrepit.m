@@ -46,6 +46,11 @@ fclose(fileID);
 %% Convert the contents of columns containing numeric text to numbers.
 % Replace non-numeric text with NaN.
 raw = repmat({''},length(dataArray{1}),length(dataArray)-1);
+
+if size(raw,1)<105 % Task was aborted early
+    subjDataMID = false;
+    return
+end
 for col=1:length(dataArray)-1
     raw(1:length(dataArray{col}),col) = dataArray{col};
 end
