@@ -2,10 +2,12 @@
 dbstop if error
 % Create string for MID_
 if ~exist('dataDir','var')
-    dataDir = '/Users/tariqcannonier/Documents/aux_incoming_Feb_2017/';% Indicate where the data is housed
+    %dataDir = '/Users/tariqcannonier/Documents/aux_incoming_Feb_2017/';% Indicate where the data is housed
     scriptDir = fullfile(pwd);
     a = regexp(scriptDir,'/');
-    outputDir = fullfile(scriptDir(1:a(end-1)),'Output/MID',datestr(now,'yyyymmdd'));
+    dataDir = [Home, fullfile(scriptDir(a(3):a(end-1)),'aux_incoming_Feb_2017')];
+    outputDir = [Home, fullfile(scriptDir(a(3):a(end-1)),'Output/MID',datestr(now,'yyyymmdd'))];
+    %outputDir = fullfile(scriptDir(1:a(end-1)),'Output/MID',datestr(now,'yyyymmdd'));
 end
 
 EventName = 'baseline_year_1_arm_1';
