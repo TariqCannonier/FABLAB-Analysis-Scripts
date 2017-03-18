@@ -21,8 +21,8 @@ xlabel('Money in Dollars','FontSize',20)
 ylabel('Frequency','FontSize',20)
 
 OverallMoneyAdj = OverallMoney;
-oneDollarInd = table2array(OverallMoneyAdj(:,'OverallMoney'))<1;
-OverallMoneyAdj(oneDollarInd,'OverallMoney') = {1};
+oneDollarInd = table2array(MID(:,'OverallMoney'))<1;
+MID(oneDollar
 
 fig(2) = figure(2);
 set(fig(2),'Position',[1 100 1600 1600]);
