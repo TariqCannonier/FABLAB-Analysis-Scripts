@@ -206,7 +206,7 @@ b1(2).FaceColor = gray_index(3,:);
 title(sprintf('MID Loss v Reward (Hit Rate)\nN = %1.0f',length(signal.loss.small.HRdata)),'Fontsize',30)
 xlabel('Condition','Fontsize',24)
 ylabel('Hit Rate','Fontsize',24)
-legend('Small','Large','Neutral')
+legend('Small','Large')
 set(gca,'xticklabels',{'Loss','Reward'},'Fontsize',16)
 ylim([0 ymax])
 hold on
@@ -241,7 +241,7 @@ b2(2).FaceColor = gray_index(3,:);
 title(sprintf('MID Loss v Reward (Reaction Time)\nN = %1.0f', length(signal.loss.small.RTdata)),'Fontsize',30)
 xlabel('Condition','Fontsize',24)
 ylabel('Reaction Time','Fontsize',24)
-legend('Small','Large','Neutral')
+legend('Small','Large')
 set(gca,'xticklabels',{'Loss','Reward'},'Fontsize',16)
 ylim([0 ceil(max([signal.loss.small.RTmean signal.loss.large.RTmean, signal.neutral.RTmean, signal.reward.small.RTmean, signal.reward.large.RTmean,signal.neutral.RTmean]))*1.4])
 hold on
