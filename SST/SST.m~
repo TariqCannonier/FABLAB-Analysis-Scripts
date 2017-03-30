@@ -216,10 +216,9 @@ for sitez = 1:length(sites) % Change back to 1 to start from top of cohort.  Cha
         go_incorrect = subDataSST.GoACC(goTrials)==0;
         go_noresp = isnan(subDataSST.GoRESP(goTrials));  %~sum(subDataSST.GoRESP(goTrials)==[1,2],2);
         go_resp = ~isnan(subDataSST.GoRESP(goTrials));
-        go_nofix = isnan(subDataSST.FixRESP(goTrials));
+        go_nofix = isnan(subDataSST.FixRESP(goTrials))==1;
         go_fix = ~isnan(subDataSST.FixRESP(goTrials));
-        go_noresp_fix = go_noresp&go_nofix;
-
+        
         go_wrong = go_incorrect&go_resp;
         go_wrong_noresp = go_incorrect&go_noresp;
         go_late = go_wrong_noresp&go_fix;
