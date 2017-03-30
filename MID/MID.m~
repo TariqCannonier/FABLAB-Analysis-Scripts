@@ -144,17 +144,17 @@ for sitez = 1:length(sites) % Change back to 1 to start from top of cohort.  Cha
             1;
         end
         % Find the participant's MID data and import the data to a variable
-        while (isempty(subDataMID) || strcmp(table2array(subDataMID(1,1)),'ExperimentName')==false) && i<=length(subDataFile)
+        while (isempty(subDataMID) || strcmp(subDataMID.ExperimentName(1),'ExperimentName')==false) && i<=length(subDataFile)
             subDataPath = [];
             if strfind(subDataFile(i).name,[shortID,'_MID'])
                 subDataPath = fullfile(subDataFile(i).folder,subDataFile(i).name); % Import assuming old Siemens/Phillips scripts
                 subDataMID = importSubjDataMIDtable(subDataPath); % Use version 13
-                version = table2array(subDataMID(2,'MIDVERSION'));
+                version = subDataMID.MIDVERSION(2);
             end
             if isempty(subDataPath) || isempty(subDataMID)
                 i = i+1;
                 continue;
-            elseif cell2mat(strfind(table2array(subDataMID(1,1)),'edit')) % If first row contains phrase "edit" delete row.
+            elseif cell2mat(strfind(subDataMID.ExperimentName(1),'edit')) % If first row contains phrase "edit" delete row.
                 subDataMID(1,:) = [];
             end
             i = i+1;
@@ -164,16 +164,16 @@ for sitez = 1:length(sites) % Change back to 1 to start from top of cohort.  Cha
             [h,m,s] = hms(datetime('now','Format','HH:mm:ss.SS')-t0); % Clock script runtime
             fprintf('Skipping MID... Site: %s, ID: %s, elapsed_time: %01.0f:%02.0f:%02.2f\n',Site,ID,h,m,s); % Print runtime
             continue;
-        elseif cell2mat(strfind(table2array(subDataMID(2,'ExperimentName')),'GE')) % If using GE scanner.  Otherwise Phillips/Siemens
-            if strcmpi(table2array(subDataMID(1,'MIDVERSION')),'MIDVERSION') % Uses old version
+        elseif cell2mat(strfind(subDataMID.ExperimentName(2),'GE')) % If using GE scanner.  Otherwise Phillips/Siemens
+            if strcmpi(subDataMID.MIDVERSION(1),'MIDVERSION') % Uses old version
                 subDataMID = importSubjDataMIDGEDecrepit(subDataPath);
-                version = table2array(subDataMID(2,'MIDVERSION'));
+                version = subDataMID.MIDVERSION(2);
             else
                 subDataMID = importSubjDataMIDGE(subDataPath);
-                version = table2array(subDataMID(2,'TrialOrder'));
+                version = subDataMID.TrialOrder(2);
             end
-        elseif ~strcmpi(table2array(subDataMID(1,'MIDVERSION')),'MIDVERSION') % Using new Phillips/Siemens scripts
-            if strcmpi(table2array(subDataMID(1,'SessionTime')),'TrialOrder') % Using the Dec experiment package
+        elseif ~strcmpi(subDataMID.MIDVERSION(1),'MIDVERSION') % Using new Phillips/Siemens scripts
+            if strcmpi(subDataMID.SessionTime(1),'TrialOrder') % Using the Dec experiment package
                 %subDataMID = importSubjDataMIDtableDecrepit(subDataPath);
                 subDataMID = importSubjDataMID13table(subDataPath);
             end
@@ -182,13 +182,13 @@ for sitez = 1:length(sites) % Change back to 1 to start from top of cohort.  Cha
                     continue
                 end
             end
-            version = table2array(subDataMID(2,'TrialOrder'));
-        elseif strcmpi(table2array(subDataMID(2,'ExperimentName')),'Behavioral')
+            version = subDataMID.TrialOrder(2);
+        elseif strcmpi(table2array(subDataMID.ExperimentName(2)),'Behavioral')
             %subDataMID = importSubjDataMID13table(subDataPath); % Use version 1-12
-            if cell2mat(strfind(table2array(subDataMID(2,'DataFileBasename')),'Behavioral'))
+            if cell2mat(strfind(subDataMID.DataFileBasename(2),'Behavioral'))
                 subDataMID = importSubjDataMIDBehavtable(subDataPath);
             end
-            version = table2array(subDataMID(2,'TrialOrder'));
+            version = subDataMID.TrialOrder(2);
         end
         %{
         if isempty(subDataMID) % Skip forward if subDataMID isempty
@@ -199,112 +199,112 @@ for sitez = 1:length(sites) % Change back to 1 to start from top of cohort.  Cha
         % Columns of interest for performance Data. Cut NaN entries from
         % variable.
         Conditions_MID = {'Block','SubTrial','Condition','prbacc','prbrt','RunMoney'};
-        nanInd = isnan(table2array(subDataMID(:,'prbacc')));
+        nanInd = isnan(subDataMID.prbacc);
         subDataMID = subDataMID(~nanInd,:);
         
         try
             % Compute Variables of interest for Output
             % Overall = run1&2; Combined = Small and Large;
-            run1Ind = find(table2array(subDataMID(:,'Block'))==1);
-            run2Ind = find(table2array(subDataMID(:,'Block'))==2);
-            rewardInd = ~cellfun('isempty',strfind(table2array(subDataMID(:,'Condition')),'Reward'));
-            punishInd = ~cellfun('isempty',strfind(table2array(subDataMID(:,'Condition')),'Pun'));
-            lgrewardInd = strcmp(table2array(subDataMID(:,'Condition')),'LgReward');
-            smrewardInd = strcmp(table2array(subDataMID(:,'Condition')),'SmallReward');
-            lgpunishInd = strcmp(table2array(subDataMID(:,'Condition')),'LgPun');
-            smpunishInd = strcmp(table2array(subDataMID(:,'Condition')),'SmallPun');
-            neutralInd = strcmp(table2array(subDataMID(:,'Condition')),'Triangle');
+            run1Ind = find(subDataMID.Block==1);
+            run2Ind = find(subDataMID.Block==2);
+            rewardInd = ~cellfun('isempty',strfind(subDataMID.Condition,'Reward'));
+            punishInd = ~cellfun('isempty',strfind(subDataMID.Condition,'Pun'));
+            lgrewardInd = strcmp(subDataMID.Condition,'LgReward');
+            smrewardInd = strcmp(subDataMID.Condition,'SmallReward');
+            lgpunishInd = strcmp(subDataMID.Condition,'LgPun');
+            smpunishInd = strcmp(subDataMID.Condition,'SmallPun');
+            neutralInd = strcmp(subDataMID.Condition,'Triangle');
             
-            nTrials = length(table2array(subDataMID(:,'SubTrial')));
-            OverallMoney = sum(table2array(subDataMID(:,'RunMoney')));
-            OverallCombinedRewardHitRate = sum(table2array(subDataMID(rewardInd,'prbacc')))/nTrials;
+            nTrials = length(subDataMID.SubTrial);
+            OverallMoney = sum(subDataMID.RunMoney);
+            OverallCombinedRewardHitRate = sum(subDataMID.prbacc(rewardInd))/nTrials;
             OverallCombinedRewardMissRate = 1-OverallCombinedRewardHitRate;
-            OverallCombinedRewardMeanRT = mean(table2array(subDataMID(rewardInd,'prbrt')));
-            OverallCombinedRewardRT_Std = std(table2array(subDataMID(rewardInd,'prbrt')));
+            OverallCombinedRewardMeanRT = mean(subDataMID.prbrt(rewardInd));
+            OverallCombinedRewardRT_Std = std(subDataMID.prbrt(rewardInd));
             
-            OverallCombinedLossHitRate = sum(table2array(subDataMID(punishInd,'prbacc')))/nTrials;
+            OverallCombinedLossHitRate = sum(subDataMID.prbacc(punishInd))/nTrials;
             OverallCombinedLossMissRate = 1-OverallCombinedLossHitRate;
-            OverallCombinedLossMeanRT = mean(table2array(subDataMID(punishInd,'prbrt')));
-            OverallCombinedLossRT_Std = std(table2array(subDataMID(punishInd,'prbrt')));
+            OverallCombinedLossMeanRT = mean(subDataMID.prbrt(punishInd));
+            OverallCombinedLossRT_Std = std(subDataMID.prbrt(punishInd));
             
-            OverallSmallRewardHitRate = sum(table2array(subDataMID(smrewardInd,'prbacc')))/nTrials;
+            OverallSmallRewardHitRate = sum(subDataMID.prbacc(smrewardInd))/nTrials;
             OverallSmallRewardMissRate	= 1-OverallSmallRewardHitRate;
-            OverallSmallRewardMeanRT = mean(table2array(subDataMID(smrewardInd,'prbrt')));
-            OverallSmallRewardRT_Std = std(table2array(subDataMID(smrewardInd,'prbrt')));
+            OverallSmallRewardMeanRT = mean(subDataMID.prbrt(smrewardInd));
+            OverallSmallRewardRT_Std = std(subDataMID.prbrt(smrewardInd));
             
-            OverallLargeRewardHitRate = sum(table2array(subDataMID(lgrewardInd,'prbacc')))/nTrials;
+            OverallLargeRewardHitRate = sum(subDataMID.prbacc(lgrewardInd))/nTrials;
             OverallLargeRewardMissRate = 1-OverallLargeRewardHitRate;
-            OverallLargeRewardMeanRT = mean(table2array(subDataMID(lgrewardInd,'prbrt')));
-            OverallLargeRewardRT_Std = std(table2array(subDataMID(lgrewardInd,'prbrt')));
+            OverallLargeRewardMeanRT = mean(subDataMID.prbacc(lgrewardInd));
+            OverallLargeRewardRT_Std = std(subDataMID.prbacc(lgrewardInd));
             
-            OverallSmallLossHitRate = sum(table2array(subDataMID(smpunishInd,'prbacc')))/nTrials;
+            OverallSmallLossHitRate = sum(subDataMID.prbacc(smpunishInd))/nTrials;
             OverallSmallLossMissRate = 1-OverallSmallLossHitRate;
-            OverallSmallLossMeanRT = mean(table2array(subDataMID(smpunishInd,'prbrt')));
-            OverallSmallLossRT_Std = std(table2array(subDataMID(smpunishInd,'prbrt')));
+            OverallSmallLossMeanRT = mean(subDataMID.prbrt(smpunishInd));
+            OverallSmallLossRT_Std = std(subDataMID.prbrt(smpunishInd));
             
-            OverallLargeLossHitRate = sum(table2array(subDataMID(lgpunishInd,'prbacc')))/nTrials;
+            OverallLargeLossHitRate = sum(subDataMID.prbacc(lgpunishInd))/nTrials;
             OverallLargeLossMissRate = 1-OverallLargeLossHitRate;
-            OverallLargeLossMeanRT = mean(table2array(subDataMID(lgpunishInd,'prbrt')));
-            OverallLargeLossRT_Std = std(table2array(subDataMID(lgpunishInd,'prbrt')));
+            OverallLargeLossMeanRT = mean(subDataMID.prbrt(lgpunishInd));
+            OverallLargeLossRT_Std = std(subDataMID.prbrt(lgpunishInd));
             
-            OverallNeutralHitRate = sum(table2array(subDataMID(neutralInd,'prbacc')))/nTrials;
+            OverallNeutralHitRate = sum(subDataMID.prbacc(neutralInd))/nTrials;
             OverallNeutralMissRate = 1-OverallLargeLossMissRate;
-            OverallNeutralMeanRT = mean(table2array(subDataMID(neutralInd,'prbrt')));
-            OverallNeutralRT_Std = std(table2array(subDataMID(neutralInd,'prbrt')));
+            OverallNeutralMeanRT = mean(subDataMID.prbrt(neutralInd));
+            OverallNeutralRT_Std = std(subDataMID.prbrt(neutralInd));
             
-            run1Money = sum(table2array(subDataMID(run1Ind,'RunMoney')));
-            run1CombinedRewardHitRate = sum(table2array(subDataMID(rewardInd(1:50),'prbacc')))/(nTrials/2);
+            run1Money = sum(subDataMID.RunMoney(run1Ind));
+            run1CombinedRewardHitRate = sum(subDataMID.prbacc(rewardInd(1:50)))/(nTrials/2);
             run1CombinedRewardMissRate = 1-run1CombinedRewardHitRate;
-            run1CombinedRewardMeanRT = mean(table2array(subDataMID(rewardInd(1:50),'prbrt')));
-            run1CombinedRewardRT_Std = std(table2array(subDataMID(rewardInd(1:50),'prbrt')));
+            run1CombinedRewardMeanRT = mean(subDataMID.prbrt(rewardInd(1:50)));
+            run1CombinedRewardRT_Std = std(subDataMID.prbrt(rewardInd(1:50)));
             
-            run1CombinedLossHitRate = sum(table2array(subDataMID(punishInd(1:50),'prbacc')))/(nTrials/2);
+            run1CombinedLossHitRate = sum(subDataMID.prbacc(punishInd(1:50)))/(nTrials/2);
             run1CombinedLossMissRate = 1-run1CombinedLossHitRate;
-            run1CombinedLossMeanRT = mean(table2array(subDataMID(punishInd(1:50),'prbrt')));
-            run1CombinedLossRT_Std = std(table2array(subDataMID(punishInd(1:50),'prbrt')));
+            run1CombinedLossMeanRT = mean(subDataMID.prbrt(punishInd(1:50)));
+            run1CombinedLossRT_Std = std(subDataMID.prbrt(punishInd(1:50)));
             
-            run1SmallRewardHitRate = sum(table2array(subDataMID(smrewardInd(1:50),'prbacc')))/(nTrials/2);
+            run1SmallRewardHitRate = sum(subDataMID.prbacc(smrewardInd(1:50)))/(nTrials/2);
             run1SmallRewardMissRate = 1-run1SmallRewardHitRate;
-            run1SmallRewardMeanRT = mean(table2array(subDataMID(smrewardInd(1:50),'prbrt')));
-            run1SmallRewardRT_Std = std(table2array(subDataMID(smrewardInd(1:50),'prbrt')));
+            run1SmallRewardMeanRT = mean(subDataMID.prbacc(smrewardInd(1:50)));
+            run1SmallRewardRT_Std = std(subDataMID.prbacc(smrewardInd(1:50)));
             
-            run1LargeRewardHitRate = sum(table2array(subDataMID(lgrewardInd(1:50),'prbacc')))/(nTrials/2);
+            run1LargeRewardHitRate = sum(subDataMID.prbacc(lgrewardInd(1:50)))/(nTrials/2);
             run1LargeRewardMissRate = 1-run1LargeRewardHitRate;
-            run1LargeRewardMeanRT = mean(table2array(subDataMID(lgrewardInd(1:50),'prbrt')));
-            run1LargeRewardRT_Std = std(table2array(subDataMID(lgrewardInd(1:50),'prbrt')));
+            run1LargeRewardMeanRT = mean(subDataMID.prbrt(lgrewardInd(1:50)));
+            run1LargeRewardRT_Std = std(subDataMID.prbrt(lgrewardInd(1:50)));
             
-            run1SmallLossHitRate = sum(table2array(subDataMID(smpunishInd(1:50),'prbacc')))/(nTrials/2);
+            run1SmallLossHitRate = sum(subDataMID.prbacc(smpunishInd(1:50)))/(nTrials/2);
             run1SmallLossMissRate = 1-run1SmallLossHitRate;
             run1SmallLossMeanRT = mean(table2array(subDataMID(smpunishInd(1:50),'prbrt')));
             run1SmallLossRT_Std = std(table2array(subDataMID(smpunishInd(1:50),'prbrt')));
             
-            run1LargeLossHitRate = sum(table2array(subDataMID(lgpunishInd(1:50),'prbacc')))/(nTrials/2);
+            run1LargeLossHitRate = sum(subDataMID.prbacc(lgpunishInd(1:50)))/(nTrials/2);
             run1LargeLossMissRate = 1- run1LargeLossHitRate;
             run1LargeLossMeanRT = mean(table2array(subDataMID(lgpunishInd(1:50),'prbrt')));
             run1LargeLossRT_Std = std(table2array(subDataMID(lgpunishInd(1:50),'prbrt')));
             
-            run1NeutralHitRate = sum(table2array(subDataMID(neutralInd(1:50),'prbacc')))/(nTrials/2);
+            run1NeutralHitRate = sum(subDataMID.prbacc(neutralInd(1:50)))/(nTrials/2);
             run1NeutralMissRate = 1-run1NeutralHitRate;
-            run1NeutralMeanRT = mean(table2array(subDataMID(neutralInd(1:50),'prbrt')));
+            run1NeutralMeanRT = mean(subDataMID.prbrt(neutralInd(1:50)));
             run1NeutralRT_Std = std(table2array(subDataMID(neutralInd(1:50),'prbrt')));
             
             run2Money = sum(table2array(subDataMID(run2Ind,'RunMoney')));
-            run2CombinedRewardHitRate = sum(table2array(subDataMID(rewardInd(51:end),'prbacc')))/(nTrials/2);
+            run2CombinedRewardHitRate = sum(subDataMID.prbacc(rewardInd(51:end)))/(nTrials/2);
             run2CombinedRewardMissRate = 1-run2CombinedRewardHitRate;
             run2CombinedRewardMeanRT = mean(table2array(subDataMID(rewardInd(51:end),'prbrt')));
             run2CombinedRewardRT_Std = std(table2array(subDataMID(rewardInd(51:end),'prbrt')));
             
-            run2CombinedLossHitRate = sum(table2array(subDataMID(punishInd(51:end),'prbacc')))/(nTrials/2);
+            run2CombinedLossHitRate = sum(subDataMID.prbacc(punishInd(51:end)))/(nTrials/2);
             run2CombinedLossMissRate = 1-run2CombinedLossHitRate;
             run2CombinedLossMeanRT = mean(table2array(subDataMID(punishInd(51:end),'prbrt')));
             run2CombinedLossRT_Std = std(table2array(subDataMID(punishInd(51:end),'prbrt')));
             
-            run2SmallRewardHitRate = sum(table2array(subDataMID(smrewardInd(51:end),'prbacc')))/(nTrials/2);
+            run2SmallRewardHitRate = sum(subDataMID.prbacc(smrewardInd(51:end)))/(nTrials/2);
             run2SmallRewardMissRate = 1-run2SmallRewardHitRate;
             run2SmallRewardMeanRT = mean(table2array(subDataMID(smrewardInd(51:end),'prbrt')));
             run2SmallRewardRT_Std = std(table2array(subDataMID(smrewardInd(51:end),'prbrt')));
             
-            run2LargeRewardHitRate = sum(table2array(subDataMID(lgrewardInd(51:end),'prbacc')))/(nTrials/2);
+            run2LargeRewardHitRate = sum(subDataMID.prbacc(lgrewardInd(51:end)))/(nTrials/2);
             run2LargeRewardMissRate = 1-run2LargeRewardHitRate;
             run2LargeRewardMeanRT = mean(table2array(subDataMID(lgrewardInd(51:end),'prbrt')));
             run2LargeRewardRT_Std = std(table2array(subDataMID(lgrewardInd(51:end),'prbrt')));
