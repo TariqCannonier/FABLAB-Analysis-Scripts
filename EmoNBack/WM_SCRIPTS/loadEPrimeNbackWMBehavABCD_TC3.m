@@ -359,7 +359,7 @@ for sitez = 1:length(sites)
         while strcmp(subDataREC(1),'ExperimentName')==false && i<=length(subDataFile)
             subDataPath = [];
             if strfind(subDataFile(i).name,[shortID,'_REC']) % If data file matches shortID and is REC
-                if strfind(subDataFile(i).name,[shortID,'_RECWEB']) % If data file matches shortID and is REC
+                if strfind(subDataFile(i).name,[shortID,'_RECWEB']) % If data file matches shortID and is RECWEB
                     subDataPath = fullfile(subDataFile(i).folder,subDataFile(i).name);
                     subDataREC = importSubjDataRECWEB(subDataPath);
                     web = true;

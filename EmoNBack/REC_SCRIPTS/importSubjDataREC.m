@@ -7,7 +7,7 @@ function KGX16MTRREC = importSubjDataREC(filename, startRow, endRow)
 %   rows STARTROW through ENDROW of text file FILENAME.
 %
 % Example:
-%   KGX16MTRREC = importfile('KGX16MTR_REC.csv', 2, 102);
+  KGX16MTRREC = importfile('KGX16MTR_REC.csv', 2, 102);
 %
 %    See also TEXTSCAN.
 
