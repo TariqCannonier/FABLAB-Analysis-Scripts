@@ -6,11 +6,11 @@
     %csvfile = dir('Output/NBack/EmoNback_WMBehaviorABCD*.csv');
     o = outputInd(end);
     file = dir(outputDir(1:o));
-    csvfileWM = dir(fullfile(file(end).folder,file(end).name,'EmoNback_WMBehaviorABCD*.csv'));
-    csvfileREC = dir(fullfile(file(end).folder,file(end).name,'EmoNback_RECBehaviorABCD*.csv'));
+    csvfileWM = dir(fullfile(file(3).folder,file(3).name,'EmoNback_WMBehaviorABCD*.csv'));
+    csvfileREC = dir(fullfile(file(3).folder,file(3).name,'EmoNback_RECBehaviorABCD*.csv'));
     %csvfile = dir(fullfile('/Users/tc587/fMRI/ABCD/ABCD Analysis Package/Output/NBack/',datestr(now,'yyyymmdd'),'EmoNback_RECBehaviorABCD*.csv'));
-    WM = importWMtable(fullfile(csvfileWM(end).folder,csvfileWM(end).name));
-    REC = importRECtable(fullfile(csvfileREC(end).folder,csvfileREC(end).name));
+    %WM = importWMtable(fullfile(csvfileWM(end).folder,csvfileWM(end).name));
+    %REC = importRECtable(fullfile(csvfileREC(end).folder,csvfileREC(end).name));
 %end
 [~, b1, ~] = unique(WM(:,'NDARGUID'),'stable');
 WM = WM(b1,:);
@@ -34,30 +34,37 @@ gray_matrix = gray;
 gray_index = 35; % Lower is darker, Higher is lighter
 %% REC: Plot Happy, Fear, Neutral, Place Overall d'
 Overall = table2array(REC(:,{'Happy_dprime', 'Fear_dprime', 'Neut_dprime', 'Place_dprime'}));
-plotLabels = {'Happy','Fear','Neut','Place'};
+plotLabels = {'Happy','Fear','Neutral','Place'};
 
 fig(1) = figure(1);
 set(fig(1),'Position',[1 100 1600 1600]);
 
 hold on
-bp1 = boxplot(Overall,'Labels',plotLabels(1:4));
+scatter(ones(size(Overall(:,1))),Overall(:,1),'o','MarkerEdgeColor',gray_matrix(gray_index,:),'LineWidth',1,'Jitter','on','JitterAmount',0.03)
+scatter(ones(size(Overall(:,2)))*2,Overall(:,2),'o','MarkerEdgeColor',gray_matrix(gray_index,:),'LineWidth',1,'Jitter','on','JitterAmount',0.03)
+scatter(ones(size(Overall(:,3)))*3,Overall(:,3),'o','MarkerEdgeColor',gray_matrix(gray_index,:),'LineWidth',1,'Jitter','on','JitterAmount',0.03)
+scatter(ones(size(Overall(:,4)))*4,Overall(:,4),'o','MarkerEdgeColor',gray_matrix(gray_index,:),'LineWidth',1,'Jitter','on','JitterAmount',0.03)
+
+bp1 = boxplot(Overall,'Labels',plotLabels(1:4),'Color',[0 0 0]);
 ylim([-6 6]) % Hard coded for dprime being ~+/-5
 %ylim([min(min(Overall))-1 max(max(Overall))+1])
 
 % Pretty-fy Boxplot title, lines, axis numbers
 set(bp1,'LineWidth',2)
 set(bp1(7,:),'Visible','off')
-set(gca,'FontSize',16)
-title(sprintf('EmoRecMem Overall Accuracy\nN = %1.0f',length(Overall)),'Fontsize',30)
-xlabel('EventType','Fontsize',24)
-ylabel('D-prime','Fontsize',24)
+set(gca,'FontSize',32,'FontName','Avenir')
+title(sprintf('Emotional Recognition Memory: Overall D-Prime\nN = %1.0f*',length(Overall)),'Fontsize',30,'FontName','Avenir')
+xlabel('Stimulus','Fontsize',40)
+ylabel('D-prime','Fontsize',40)
 
 % Plot individual data points within boxplots
-plot(1,Overall(:,1)','x','Color',gray_matrix(gray_index,:),'LineWidth',2)%[.01, .01, .01]*65,'LineWidth',2)
-plot(2,Overall(:,2)','x','Color',gray_matrix(gray_index,:),'LineWidth',2)%[.01, .01, .01]*65,'LineWidth',2)
-plot(3,Overall(:,3)','x','Color',gray_matrix(gray_index,:),'LineWidth',2)%[.01, .01, .01]*65,'LineWidth',2)
-plot(4,Overall(:,4)','x','Color',gray_matrix(gray_index,:),'LineWidth',2)%[.01, .01, .01]*65,'LineWidth',2)
-saveas(fig(1),fullfile(saveDir,'Boxplots/REC',sprintf('EmoNbackREC_Overall_Accuracy')),'jpeg')
+%plot(1,Overall(:,1)','o','Color',gray_matrix(gray_index,:),'LineWidth',2)%[.01, .01, .01]*65,'LineWidth',2)
+%plot(2,Overall(:,2)','o','Color',gray_matrix(gray_index,:),'LineWidth',2)%[.01, .01, .01]*65,'LineWidth',2)
+%plot(3,Overall(:,3)','o','Color',gray_matrix(gray_index,:),'LineWidth',2)%[.01, .01, .01]*65,'LineWidth',2)
+%plot(4,Overall(:,4)','o','Color',gray_matrix(gray_index,:),'LineWidth',2)%[.01, .01, .01]*65,'LineWidth',2)
+box off
+
+saveas(fig(1),fullfile(saveDir,'Boxplots/REC',sprintf('EmoNbackREC_Overall_Dprime')),'jpeg')
 hold off
 
 %% REC Boxplots by Sites

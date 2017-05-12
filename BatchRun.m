@@ -13,7 +13,7 @@ addpath(genpath('SST'));
 % Package'.
 %dataDir = '/Users/tc587/fMRI/ABCD/AWS_Data/EmotionalNback/ABCDData/data/';%'/Users/tc587/fMRI/ABCD/AWS_Data/aux_incoming_Nov_3rd_2016';
 %dataDir = '/Users/tc587/fMRI/ABCD/AWS_Data/Archive Data/aux_incoming_Nov_3rd_2016_2';
-dataDir = '/Users/tc587/fMRI/ABCD/AWS_Data/aux_incoming_Feb_2017';
+dataDir = '/Users/tc587/fMRI/ABCD/AWS/aux_incoming_Feb_2017';
 
 %% EmoNBack WM & REC
 scriptDir = fullfile(pwd,'EmoNBack/WM_SCRIPTS'); % Notes the directory for supplemental scripts
@@ -25,25 +25,25 @@ outputDir = fullfile(pwdir(1:outDir(end)),'Output/NBack',datestr(now,'yyyymmdd')
 outputInd = regexp(outputDir,'/');
 
 % Run EmoNBack Analysis
-run('loadEPrimeNbackWMBehavABCD_TC3.m')
+%run('loadEPrimeNbackWMBehavABCD_TC3.m')
 
 %% Plots for BJ
 % Create Boxplots for WM
-run('EmoNback_boxplotsWMtable.m'); % Uncomment to create EmoNback boxplots
+%run('EmoNback_boxplotsWMtable.m'); % Uncomment to create EmoNback boxplots
 
 % Create Boxplots for REC
-scriptDir = fullfile(pwd,'EmoNBack/REC_SCRIPTS');
-run('EmoNback_boxplotsRECtable.m');
+%scriptDir = fullfile(pwd,'EmoNBack/REC_SCRIPTS');
+%run('EmoNback_boxplotsRECtable.m');
 
 % Save Errors into .mat file for later
-nbackMat = strcat(outputDir,filesep,'NBack_Errors_',datestr(now,'yyyymmdd'));
-save(nbackMat,'eSite')
+%nbackMat = strcat(outputDir,filesep,'NBack_Errors_',datestr(now,'yyyymmdd'));
+%save(nbackMat,'eSite')
 
-close all
-clearvars -except pwdir outDir outputDir outputInd
+%close all
+%clearvars -except pwdir outDir outputDir outputInd
 %% MID
 run('MID.m'); % Create MID output files
-run('MID_Analyses.m'); % Create plots for MID 
+%run('MID_Analyses.m'); % Create plots for MID 
 
 %% SST
 
