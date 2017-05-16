@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>FABLab: RecMem</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script src="jspsych-5.0.3/jspsych.js"></script>
+  <script src="jspsych-5.0.3/plugins/jspsych-text.js"></script>
+  <script src="jspsych-5.0.3/plugins/jspsych-single-stim.js"></script>
+  <script src="jspsych-5.0.3/plugins/jspsych-survey-text.js"></script>
+  <script src="jspsych-5.0.3/plugins/jspsych-call-function.js"></script>
+  <link href="jspsych-5.0.3/css/jspsych.css" rel="stylesheet" type="text/css"></link>
+</head>
+
+<body bgcolor=grey>
+</body>
+
+<!-- Support Code with Variables, Blocks, and Instructions -->
+<script type="text/javascript" src="Experiments/JSInstruct.js"></script>
+<script type="text/javascript" src="Experiments/JSVars.js"></script>
+<script type="text/javascript" src="Experiments/JSVarsJPG.js"></script>
+<script type="text/javascript" src="Experiments/JSBlocks.js"></script>
+<script type="text/javascript" src="Login.js"></script>
+
+<script>
+var timeline = [];
+
+// Retrieve user ID from login validation and pass through to data
+var subject = localStorage.getItem("user").toUpperCase();
+jsPsych.data.addProperties({subject:subject});
+localStorage.removeItem("user");
+
+// // Determine which version (A,B,C,D) of experiment to execute based on user ID
+var run_version = subject.charAt(0);
+
+var run = [];
+var group = [];
+if(run_version === "A"){
+  run = [practice, MF_block1, MF_block2];
+  group = 1;
+}
+else if(run_version === "B"){
+  run = [practice, MF_block3, MF_block4];
+  group = 2;
+}
+else if(run_version === "C"){
+  run = [practice, MF_block5, MF_block6];
+  group = 3;
+}
+else{
+  run = [practice, MF_block7, MF_block8];
+  group = 4;
+}
+
+jsPsych.data.addProperties({group:group});
+
+timeline.push(welcome_block,instructions_block_1,instructions_block_2,instructions_block_3,instructions_block_4);
+
+// Preliminary variables to start practice run
+var condition0 = false; // This condition doesn't matter.  conditional_function doesn't work on the first trial.
+var condition1 = false;
+var condition2 = false;
+var condition3 = false;
+var condition4 = true;
+var correct = false;
+practice_block = {};
+var acc = 0;
+var choices = ['e','i','space'];
+
+for(var j = 0; j<run.length; j++) {
+  if(j===0){// When j is 0, it is designated as the Practice
+    for(var k = 0; k<conditional.length; k++) {// iterate through each item of Practice
+      var trial = [run[j][k]];
+      //var practice_block = {
+      practice_block = {
+        type: "single-stim",
+        choices: choices,//['leftarrow','rightarrow','space'],
+        timing_response: trial[0].timing_stim,
+        timing_post_trial: 0,
+        timing_stim: trial[0].timing_stim,
+        response_ends_trial: false,
+        data: {block: i},
+        on_finish: function(data){
+          correct = false; //Evaluate correct responses and appropriate feedback screens
+          condition4 = true; //Variable for "Too Slow" feedback
+          if (data.response === "PRACTICENew"){
+            correct_key_press = 2;
+          } else if (data.response === "PRACTICEOld"){
+            correct_key_press = 1;
+          } else if (data.response === "PRACTICEAttention"){
+            correct_key_press = 3;
+          }
+          if (data.key_press === jsPsych.pluginAPI.convertKeyCharacterToKeyCode(choices[1])){
+            subject_key_press = 2;
+          } else if (data.key_press === jsPsych.pluginAPI.convertKeyCharacterToKeyCode(choices[0])){
+            subject_key_press = 1;
+          } else if (data.key_press === jsPsych.pluginAPI.convertKeyCharacterToKeyCode(choices[2])){
+            subject_key_press = 3;
+          } else {
+            subject_key_press = 0;
+          }
+          if (data.key_press === -1){
+            condition4 = false; // Evaluate practice feedback for "Too Slow"
+          } else if(data.response === "new" && data.key_press === jsPsych.pluginAPI.convertKeyCharacterToKeyCode(choices[1])){
+            correct = true; // Evaluate correct response
+            condition1 = true; // Evaluate practice feedback
+            acc = 1;
+          } else if(data.response === "old" && data.key_press === jsPsych.pluginAPI.convertKeyCharacterToKeyCode(choices[0])){
+            correct = true; // Evaluate correct response
+            condition2 = true; // Evaluate practice feedback
+            acc = 1;
+          } else if(data.response === "CHECK" && data.key_press === jsPsych.pluginAPI.convertKeyCharacterToKeyCode(choices[2])){
+            correct = true; // Evaluate correct response
+            condition3 = true; // Evaluate practice feedback
+            acc = 1;
+          }
+          jsPsych.data.addDataToLastTrial({subject_key_press:subject_key_press,acc:acc,correct:correct});
+        },
+        timeline: trial
+      };
+      timeline.push(practice_block,conditional[k][0],conditional[k][2],conditional[k][1],fixation_trial); // Push the appropriate feedback to participant
+    } timeline.push(instructions_block_5, instructions_block_6);
+  } else {
+    timeline.push(fixation_block); //More instructions indicating trial initialization.
+    for(var i = 0; i<run[j].length; i++) {
+      var trial = [run[j][i]];
+      //var test_block = {
+      test_block = {
+        type: "single-stim",
+        choices: choices,//['leftarrow','rightarrow','space'],
+        timing_response: trial[0].timing_stim,
+        timing_post_trial: 0,
+        timing_stim: trial[0].timing_stim,
+        response_ends_trial: false,
+        data: {block: i},
+        on_finish: function(data){
+          var correct = false;
+          var acc = 0;
+          if (data.response === "new"){
+            correct_key_press = 2;
+          } else if (data.response === "old"){
+            correct_key_press = 1;
+          } else if (data.response === "CHECK"){
+            correct_key_press = 3;
+          }
+          if (data.key_press === jsPsych.pluginAPI.convertKeyCharacterToKeyCode(choices[1])){
+            subject_key_press = 2;
+          } else if (data.key_press === jsPsych.pluginAPI.convertKeyCharacterToKeyCode(choices[0])){
+            subject_key_press = 1;
+          } else if (data.key_press === jsPsych.pluginAPI.convertKeyCharacterToKeyCode(choices[2])){
+            subject_key_press = 3;
+          } else {
+            subject_key_press = 0;
+          }
+          if (data.response === "old" && data.key_press === jsPsych.pluginAPI.convertKeyCharacterToKeyCode(choices[0])){ //Determines if participant pressed the correct button ('leftarrow')
+            correct = true;
+            acc = 1;
+          } else if(data.response === "new" && data.key_press === jsPsych.pluginAPI.convertKeyCharacterToKeyCode(choices[1])){ //Determines if participant pressed the correct button ('rightarrow')d
+            correct = true;
+            acc = 1;
+          } else if(data.response === "CHECK" && data.key_press === jsPsych.pluginAPI.convertKeyCharacterToKeyCode(choices[2])){ //Determines if participant pressed the correct button ('rightarrow')d
+            correct = true;
+            acc = 1;
+          }
+          jsPsych.data.addDataToLastTrial({correct_key_press:correct_key_press,subject_key_press:subject_key_press,acc:acc,correct:correct});
+        },
+        timeline: trial
+      };
+      timeline.push(test_block,fixation_trial); //Push the test_block and fixation trial to presentation timeline.
+    };
+  };
+}
+timeline.push(debrief)
+
+/* start the experiment*/
+jsPsych.init({
+  timeline: timeline,
+  //fullscreen: true,
+  //on_finish: function(data) { 
+    //timeline.push(debrief);
+  	// saveData("filename.csv", jsPsych.data.dataAsCSV())
+    //jsPsych.data.displayData('csv');
+    //jsPsych.data.localSave('data.csv','csv'); //saves the experiment as a csvfile to the user computer
+    //Change code to save to a remote location on a server: http://docs.jspsych.org/features/data/#storing-data-permanently-as-a-file
+    //Play with the above code to do that.
+	//}
+});
+
+</script>
+
+
+
+
+
+</html>
