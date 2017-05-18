@@ -7,9 +7,10 @@ saveDir = fullfile(pwd,'Plots/Boxplots',datestr(now,'yyyymmdd')); % Save data to
 if ~exist(saveDir,'dir')
     mkdir(saveDir)
 end
-MID = importMID('/Users/tc587/fMRI/ABCD/Output/MID/20170317/MIDBehavior_20170317.csv');
+MID = importMID('/Users/tc587/fMRI/ABCD/Output/MID/20170518/MIDBehavior_20170318.csv');
 %% Histogram
 % Create a grayscale and index into the row with desired shade of gray.
+figNum = 1;
 gray_matrix = gray;
 gray_index = quantile(gray_matrix,[.25,.5,.75]); % Lower is darker, Higher is ligh
 
@@ -20,10 +21,13 @@ oneDollarInd = table2array(MID(:,'OverallMoney'))<100; % Only items in realistic
 fig(1) = figure(1);
 set(fig(1),'Position',[1 100 1600 1600]);
 histogram(table2array(OverallMoney(oneDollarInd,1)),'FaceColor',gray_matrix(22,:))
-title(sprintf('MID Earnings Histogram\nN = %1.0f',length(table2array(OverallMoney))),'Fontsize',36)
-set(gca,'FontSize',16)
-xlabel('Money in Dollars','FontSize',20)
-ylabel('Frequency','FontSize',20)
+title(sprintf('Monetary Incentive Delay Earnings Histogram\nN = %1.0f',length(table2array(OverallMoney))),'Fontsize',30,'FontName','Avenir')
+set(gca,'FontSize',32,'FontName','Avenir')
+xlabel('Money in Dollars','FontSize',40)
+ylabel('Frequency','FontSize',40)
+saveas(fig(figNum),fullfile(saveDir,sprintf('MID%1.0f',figNum)),'jpeg')%difSites{i})))
+figNum = figNum+1;
+
 
 % MID Adjusted for histogram of what kids walked away with.
 OverallMoneyAdj = OverallMoney(oneDollarInd,1);
@@ -32,21 +36,26 @@ OverallMoneyAdj(oneDollarInd,1) = {1};
 fig(2) = figure(2);
 set(fig(2),'Position',[1 100 1600 1600]);
 histogram(table2array(OverallMoneyAdj(:,1)),'FaceColor',gray_matrix(22,:))
-title(sprintf('MID Adjusted Earnings Histogram\nN = %1.0f',length(table2array(OverallMoneyAdj))),'Fontsize',36)
-set(gca,'FontSize',16)
-xlabel('Money in Dollars','FontSize',20)
-ylabel('Frequency','FontSize',20)
+title(sprintf('Monetary Incentive Delay: Adjusted Earnings Histogram\nN = %1.0f',length(table2array(OverallMoneyAdj))),'Fontsize',30,'FontName','Avenir')
+set(gca,'FontSize',32,'FontName','Avenir')
+xlabel('Money in Dollars','FontSize',40)
+ylabel('Frequency','FontSize',40)
+saveas(fig(figNum),fullfile(saveDir,sprintf('MID%1.0f',figNum)),'jpeg')%difSites{i})))
+figNum = figNum+1;
+
 
 %% Plot Overall HR for Reward v Loss
-signal.loss.HRdata = table2array(MID(~isnan(table2array(MID(:,'OverallCombinedLossHitRate'))),'OverallCombinedLossHitRate'));
-signal.loss.RTdata = table2array(MID(~isnan(table2array(MID(:,'OverallCombinedLossMeanRT'))),'OverallCombinedLossMeanRT'));
+cutData = ~isnan(table2array(MID(:,'OverallCombinedLossMeanRT')));
+signal.loss.HRdata = table2array(MID(cutData,'OverallCombinedLossHitRate'));
+signal.loss.RTdata = table2array(MID(cutData,'OverallCombinedLossMeanRT'));
 signal.loss.HRmean = mean(signal.loss.HRdata);
 signal.loss.HRstd = std(signal.loss.HRdata);
 signal.loss.RTmean = mean(signal.loss.RTdata);
 signal.loss.RTstd = std(signal.loss.RTdata);
 
-signal.loss.large.HRdata = table2array(MID(~isnan(table2array(MID(:,'OverallLargeLossHitRate'))),'OverallLargeLossHitRate'));
-signal.loss.large.RTdata = table2array(MID(~isnan(table2array(MID(:,'OverallLargeLossMeanRT'))),'OverallLargeLossMeanRT'));
+cutData = ~isnan(table2array(MID(:,'OverallLargeLossMeanRT')));
+signal.loss.large.HRdata = table2array(MID(cutData,'OverallLargeLossHitRate'));
+signal.loss.large.RTdata = table2array(MID(cutData,'OverallLargeLossMeanRT'));
 signal.loss.large.HRmean = mean(signal.loss.large.HRdata);
 signal.loss.large.RTmean = mean(signal.loss.large.RTdata);
 signal.loss.large.HRstd = std(signal.loss.large.HRdata);
@@ -60,29 +69,33 @@ signal.loss.small.RTmean = mean(signal.loss.small.RTdata);
 signal.loss.small.HRstd = std(signal.loss.small.HRdata);
 signal.loss.small.RTstd = std(signal.loss.small.RTdata);
 
-signal.reward.HRdata = table2array(MID(~isnan(table2array(MID(:,'OverallCombinedRewardHitRate'))),'OverallCombinedRewardHitRate'));
-signal.reward.RTdata = table2array(MID(~isnan(table2array(MID(:,'OverallCombinedRewardMeanRT'))),'OverallCombinedRewardMeanRT'));
+cutData = ~isnan(table2array(MID(:,'OverallCombinedRewardMeanRT')));
+signal.reward.HRdata = table2array(MID(cutData,'OverallCombinedRewardHitRate'));
+signal.reward.RTdata = table2array(MID(cutData,'OverallCombinedRewardMeanRT'));
 signal.reward.HRmean= mean(signal.reward.HRdata);
 signal.reward.HRstd = std(signal.reward.HRdata);
 signal.reward.RTmean = mean(signal.reward.RTdata);
 signal.reward.RTstd = std(signal.reward.RTdata);
 
-signal.reward.large.HRdata = table2array(MID(~isnan(table2array(MID(:,'OverallLargeRewardHitRate'))),'OverallLargeRewardHitRate'));%OverallLargeRewardHitRate(find(~isnan(OverallLargeRewardHitRate)));
-signal.reward.large.RTdata = table2array(MID(~isnan(table2array(MID(:,'OverallLargeRewardMeanRT'))),'OverallLargeRewardMeanRT'));%OverallLargeRewardMeanRT(find(~isnan(OverallLargeRewardMeanRT)));
+cutData = ~isnan(table2array(MID(:,'OverallLargeRewardMeanRT')));
+signal.reward.large.HRdata = table2array(MID(cutData,'OverallLargeRewardHitRate'));%OverallLargeRewardHitRate(find(~isnan(OverallLargeRewardHitRate)));
+signal.reward.large.RTdata = table2array(MID(cutData,'OverallLargeRewardMeanRT'));%OverallLargeRewardMeanRT(find(~isnan(OverallLargeRewardMeanRT)));
 signal.reward.large.HRmean = mean(signal.reward.large.HRdata);
 signal.reward.large.HRstd = std(signal.reward.large.HRdata);
 signal.reward.large.RTmean = mean(signal.reward.large.RTdata);
 signal.reward.large.RTstd = std(signal.reward.large.RTdata);
 
-signal.reward.small.HRdata = table2array(MID(~isnan(table2array(MID(:,'OverallSmallRewardHitRate'))),'OverallSmallRewardHitRate'));%OverallSmallRewardHitRate(find(~isnan(OverallSmallRewardHitRate)));
-signal.reward.small.RTdata = table2array(MID(~isnan(table2array(MID(:,'OverallSmallRewardMeanRT'))),'OverallSmallRewardMeanRT'));%OverallSmallRewardMeanRT(find(~isnan(OverallSmallRewardMeanRT)));
+cutData = ~isnan(table2array(MID(:,'OverallSmallRewardMeanRT')));
+signal.reward.small.HRdata = table2array(MID(cutData,'OverallSmallRewardHitRate'));%OverallSmallRewardHitRate(find(~isnan(OverallSmallRewardHitRate)));
+signal.reward.small.RTdata = table2array(MID(cutData,'OverallSmallRewardMeanRT'));%OverallSmallRewardMeanRT(find(~isnan(OverallSmallRewardMeanRT)));
 signal.reward.small.HRmean = mean(signal.reward.small.HRdata);
 signal.reward.small.HRstd = std(signal.reward.small.HRdata);
 signal.reward.small.RTmean = mean(signal.reward.large.RTdata);
 signal.reward.small.RTstd = std(signal.reward.large.RTdata);
 
-signal.neutral.HRdata = table2array(MID(~isnan(table2array(MID(:,'OverallNeutralHitRate'))),'OverallNeutralHitRate'));%OverallNeutralHitRate(find(~isnan(OverallNeutralHitRate)));
-signal.neutral.RTdata = table2array(MID(~isnan(table2array(MID(:,'OverallNeutralMeanRT'))),'OverallNeutralMeanRT'));%OverallNeutralMeanRT(find(~isnan(OverallNeutralMeanRT)));
+cutData = ~isnan(table2array(MID(:,'OverallNeutralMeanRT')));
+signal.neutral.HRdata = table2array(MID(cutData,'OverallNeutralHitRate'));%OverallNeutralHitRate(find(~isnan(OverallNeutralHitRate)));
+signal.neutral.RTdata = table2array(MID(cutData,'OverallNeutralMeanRT'));%OverallNeutralMeanRT(find(~isnan(OverallNeutralMeanRT)));
 signal.neutral.HRmean = mean(signal.neutral.HRdata);
 signal.neutral.RTmean = mean(signal.neutral.RTdata);
 signal.neutral.HRstd = std(signal.neutral.HRdata);
@@ -94,8 +107,9 @@ signal.neutral.RTstd = std(signal.neutral.RTdata);
 %signal.reward.small
 %signal.reward.neutral
 
-signal.run1.HRdata = table2array(MID(~isnan(table2array(MID(:,'run1CombinedLossHitRate'))),'run1CombinedLossHitRate'));%run1CombinedLossHitRate(find(~isnan(run1CombinedLossHitRate)));
-signal.run1.RTdata = table2array(MID(~isnan(table2array(MID(:,'run1CombinedLossMeanRT'))),'run1CombinedLossMeanRT'));%run1CombinedLossMeanRT(find(~isnan(run1CombinedLossMeanRT)));
+cutData = ~isnan(table2array(MID(:,'run1CombinedLossMeanRT')));
+signal.run1.HRdata = table2array(MID(cutData,'run1CombinedLossHitRate'));%run1CombinedLossHitRate(find(~isnan(run1CombinedLossHitRate)));
+signal.run1.RTdata = table2array(MID(cutData,'run1CombinedLossMeanRT'));%run1CombinedLossMeanRT(find(~isnan(run1CombinedLossMeanRT)));
 signal.run1.HRmean = mean(signal.run1.HRdata);
 signal.run1.HRstd = std(signal.run1.HRdata);
 signal.run1.RTmean = mean(signal.run1.RTdata);
@@ -104,8 +118,9 @@ signal.run1.RTstd = std(signal.run1.RTdata);
 %signal.run1.small
 %signal.run1.neutral
 
-signal.run2.HRdata = table2array(MID(~isnan(table2array(MID(:,'run2CombinedLossHitRate'))),'run2CombinedLossHitRate'));%run2CombinedLossHitRate(find(~isnan(run2CombinedLossHitRate)));
-signal.run2.RTdata = table2array(MID(~isnan(table2array(MID(:,'run2CombinedLossMeanRT'))),'run2CombinedLossMeanRT'));%run2CombinedLossMeanRT(find(~isnan(run2CombinedLossMeanRT)));
+cutData = ~isnan(table2array(MID(:,'run2CombinedLossMeanRT')));
+signal.run2.HRdata = table2array(MID(cutData,'run2CombinedLossHitRate'));%run2CombinedLossHitRate(find(~isnan(run2CombinedLossHitRate)));
+signal.run2.RTdata = table2array(MID(cutData,'run2CombinedLossMeanRT'));%run2CombinedLossMeanRT(find(~isnan(run2CombinedLossMeanRT)));
 signal.run2.HRmean = mean(signal.run2.HRdata);
 signal.run2.HRstd = std(signal.run2.HRdata);
 signal.run2.RTmean = mean(signal.run2.RTdata);
@@ -116,12 +131,11 @@ signal.run2.RTstd = std(signal.run2.RTdata);
 %signal.run2.neutral = 
 
 %% Plotting Signal Detection
-figNum = 1;
 ymax = 0.5;
 % Overall Loss v Reward v Neutral(Hit Rate)
 fig(figNum) = figure(figNum);
 bar([signal.loss.HRmean,signal.reward.HRmean,signal.neutral.HRmean],'FaceColor',gray_index(2,:))
-title(sprintf('MID Overall Loss v Reward v Neutral (Hit Rate)\nN = %1.0f',length(signal.loss.HRdata)),'Fontsize',30)
+title(sprintf('Monetary Incentive Delay Overall Loss v Reward v Neutral (Hit Rate)\nN = %1.0f',length(signal.loss.HRdata)),'Fontsize',30)
 xlabel('Condition','Fontsize',24)
 ylabel('Hit Rate','Fontsize',24)
 set(gca,'xticklabels',{'Loss','Reward','Neutral'},'Fontsize',16)
@@ -136,7 +150,7 @@ figNum = figNum+1;
 % Overall Loss v Reward v Nuetral (Reaction Time)
 fig(figNum) = figure(figNum);
 bar([signal.loss.RTmean,signal.reward.RTmean,signal.neutral.RTmean],'FaceColor',gray_index(2,:))
-title(sprintf('MID Overall Loss v Reward v Neutral (Reaction Time)\nN = %1.0f',length(signal.loss.HRdata)),'Fontsize',30)
+title(sprintf('Monetary Incentive Delay Overall Loss v Reward v Neutral (Reaction Time)\nN = %1.0f',length(signal.loss.HRdata)),'Fontsize',30)
 xlabel('Condition','Fontsize',24)
 ylabel('Reaction Time (ms)','Fontsize',24)
 set(gca,'xticklabels',{'Loss','Reward','Neutral'},'Fontsize',16)
@@ -151,7 +165,7 @@ figNum = figNum+1;
 % Overall Run1 v Run2 (Hit Rate)
 fig(figNum) = figure(figNum);
 bar([signal.run1.HRmean,signal.run2.HRmean],'FaceColor',gray_index(2,:))
-title(sprintf('MID Overall Run1 v Run2 (Hit Rate)\nN = %1.0f',length(signal.loss.HRdata)),'Fontsize',30)
+title(sprintf('Monetary Incentive Delay: Overall Run1 v Run2 (Hit Rate)\nN = %1.0f',length(signal.loss.HRdata)),'Fontsize',30)
 xlabel('Condition','Fontsize',24)
 ylabel('Hit Rate','Fontsize',24)
 set(gca,'xticklabels',{'Run1','Run2'},'Fontsize',16)
@@ -166,7 +180,7 @@ figNum = figNum+1;
 % Overall Run1 v Run2 (Reaction Time)
 fig(figNum) = figure(figNum);
 bar([signal.run1.RTmean,signal.run2.RTmean],'FaceColor',gray_index(2,:))
-title(sprintf('MID Overall Run1 v Run2 (Reaction Time)\nN = %1.0f',length(signal.run1.HRdata)),'Fontsize',30)
+title(sprintf('Monetary Incentive Delay: Overall Run1 v Run2 (Reaction Time)\nN = %1.0f',length(signal.run1.HRdata)),'Fontsize',30)
 xlabel('Condition','Fontsize',24)
 ylabel('Reaction Time (ms)','Fontsize',24)
 set(gca,'xticklabels',{'Run1','Run2'},'Fontsize',16)
@@ -189,10 +203,10 @@ b1 = bar(model_series); %,'FaceColor',gray_matrix([22,:));
 b1(1).FaceColor = gray_index(1,:);
 %b1(2).FaceColor = gray_index(2,:);
 b1(2).FaceColor = gray_index(3,:);
-title(sprintf('MID Loss v Reward (Hit Rate)\nN = %1.0f',length(signal.loss.small.HRdata)),'Fontsize',30)
+title(sprintf('Monetary Incentive Delay: Loss v Reward (Hit Rate)\nN = %1.0f',length(signal.loss.small.HRdata)),'Fontsize',30)
 xlabel('Condition','Fontsize',24)
 ylabel('Hit Rate','Fontsize',24)
-legend('Small','Large','Neutral')
+legend('Small','Large')
 set(gca,'xticklabels',{'Loss','Reward'},'Fontsize',16)
 ylim([0 ymax])
 hold on
@@ -224,10 +238,10 @@ b2(1).FaceColor = gray_index(1,:);
 %b2(2).FaceColor = gray_index(2,:);
 b2(2).FaceColor = gray_index(3,:);
 
-title(sprintf('MID Loss v Reward (Reaction Time)\nN = %1.0f', length(signal.loss.small.RTdata)),'Fontsize',30)
+title(sprintf('Monetary Incentive Delay: Loss v Reward (Reaction Time)\nN = %1.0f', length(signal.loss.small.RTdata)),'Fontsize',30)
 xlabel('Condition','Fontsize',24)
 ylabel('Reaction Time','Fontsize',24)
-legend('Small','Large','Neutral')
+legend('Small','Large')
 set(gca,'xticklabels',{'Loss','Reward'},'Fontsize',16)
 ylim([0 ceil(max([signal.loss.small.RTmean signal.loss.large.RTmean, signal.neutral.RTmean, signal.reward.small.RTmean, signal.reward.large.RTmean,signal.neutral.RTmean]))*1.4])
 hold on

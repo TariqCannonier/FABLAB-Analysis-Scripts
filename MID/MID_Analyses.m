@@ -7,7 +7,7 @@ saveDir = fullfile(pwd,'Plots/Boxplots',datestr(now,'yyyymmdd')); % Save data to
 if ~exist(saveDir,'dir')
     mkdir(saveDir)
 end
-MID = importMID('/Users/tc587/fMRI/ABCD/Output/MID/20170317/MIDBehavior_20170317.csv');
+MID = importMID('/Users/tc587/fMRI/ABCD/Output/MID/20170518/MIDBehavior_20170518_temp.csv');
 %% Histogram
 % Create a grayscale and index into the row with desired shade of gray.
 figNum = 1;
@@ -21,10 +21,10 @@ oneDollarInd = table2array(MID(:,'OverallMoney'))<100; % Only items in realistic
 fig(1) = figure(1);
 set(fig(1),'Position',[1 100 1600 1600]);
 histogram(table2array(OverallMoney(oneDollarInd,1)),'FaceColor',gray_matrix(22,:))
-title(sprintf('MID Earnings Histogram\nN = %1.0f',length(table2array(OverallMoney))),'Fontsize',36)
-set(gca,'FontSize',16)
-xlabel('Money in Dollars','FontSize',20)
-ylabel('Frequency','FontSize',20)
+title(sprintf('Monetary Incentive Delay Earnings Histogram\nN = %1.0f',length(table2array(OverallMoney))),'Fontsize',30,'FontName','Avenir')
+set(gca,'FontSize',32,'FontName','Avenir')
+xlabel('Money in Dollars','FontSize',40)
+ylabel('Frequency','FontSize',40)
 saveas(fig(figNum),fullfile(saveDir,sprintf('MID%1.0f',figNum)),'jpeg')%difSites{i})))
 figNum = figNum+1;
 
@@ -36,10 +36,10 @@ OverallMoneyAdj(oneDollarInd,1) = {1};
 fig(2) = figure(2);
 set(fig(2),'Position',[1 100 1600 1600]);
 histogram(table2array(OverallMoneyAdj(:,1)),'FaceColor',gray_matrix(22,:))
-title(sprintf('MID Adjusted Earnings Histogram\nN = %1.0f',length(table2array(OverallMoneyAdj))),'Fontsize',36)
-set(gca,'FontSize',16)
-xlabel('Money in Dollars','FontSize',20)
-ylabel('Frequency','FontSize',20)
+title(sprintf('Monetary Incentive Delay: Adjusted Earnings Histogram\nN = %1.0f',length(table2array(OverallMoneyAdj))),'Fontsize',30,'FontName','Avenir')
+set(gca,'FontSize',32,'FontName','Avenir')
+xlabel('Money in Dollars','FontSize',40)
+ylabel('Frequency','FontSize',40)
 saveas(fig(figNum),fullfile(saveDir,sprintf('MID%1.0f',figNum)),'jpeg')%difSites{i})))
 figNum = figNum+1;
 
@@ -135,7 +135,7 @@ ymax = 0.5;
 % Overall Loss v Reward v Neutral(Hit Rate)
 fig(figNum) = figure(figNum);
 bar([signal.loss.HRmean,signal.reward.HRmean,signal.neutral.HRmean],'FaceColor',gray_index(2,:))
-title(sprintf('MID Overall Loss v Reward v Neutral (Hit Rate)\nN = %1.0f',length(signal.loss.HRdata)),'Fontsize',30)
+title(sprintf('Monetary Incentive Delay Overall Loss v Reward v Neutral (Hit Rate)\nN = %1.0f',length(signal.loss.HRdata)),'Fontsize',30)
 xlabel('Condition','Fontsize',24)
 ylabel('Hit Rate','Fontsize',24)
 set(gca,'xticklabels',{'Loss','Reward','Neutral'},'Fontsize',16)
@@ -150,7 +150,7 @@ figNum = figNum+1;
 % Overall Loss v Reward v Nuetral (Reaction Time)
 fig(figNum) = figure(figNum);
 bar([signal.loss.RTmean,signal.reward.RTmean,signal.neutral.RTmean],'FaceColor',gray_index(2,:))
-title(sprintf('MID Overall Loss v Reward v Neutral (Reaction Time)\nN = %1.0f',length(signal.loss.HRdata)),'Fontsize',30)
+title(sprintf('Monetary Incentive Delay Overall Loss v Reward v Neutral (Reaction Time)\nN = %1.0f',length(signal.loss.HRdata)),'Fontsize',30)
 xlabel('Condition','Fontsize',24)
 ylabel('Reaction Time (ms)','Fontsize',24)
 set(gca,'xticklabels',{'Loss','Reward','Neutral'},'Fontsize',16)
@@ -165,7 +165,7 @@ figNum = figNum+1;
 % Overall Run1 v Run2 (Hit Rate)
 fig(figNum) = figure(figNum);
 bar([signal.run1.HRmean,signal.run2.HRmean],'FaceColor',gray_index(2,:))
-title(sprintf('MID Overall Run1 v Run2 (Hit Rate)\nN = %1.0f',length(signal.loss.HRdata)),'Fontsize',30)
+title(sprintf('Monetary Incentive Delay: Overall Run1 v Run2 (Hit Rate)\nN = %1.0f',length(signal.loss.HRdata)),'Fontsize',30)
 xlabel('Condition','Fontsize',24)
 ylabel('Hit Rate','Fontsize',24)
 set(gca,'xticklabels',{'Run1','Run2'},'Fontsize',16)
@@ -180,7 +180,7 @@ figNum = figNum+1;
 % Overall Run1 v Run2 (Reaction Time)
 fig(figNum) = figure(figNum);
 bar([signal.run1.RTmean,signal.run2.RTmean],'FaceColor',gray_index(2,:))
-title(sprintf('MID Overall Run1 v Run2 (Reaction Time)\nN = %1.0f',length(signal.run1.HRdata)),'Fontsize',30)
+title(sprintf('Monetary Incentive Delay: Overall Run1 v Run2 (Reaction Time)\nN = %1.0f',length(signal.run1.HRdata)),'Fontsize',30)
 xlabel('Condition','Fontsize',24)
 ylabel('Reaction Time (ms)','Fontsize',24)
 set(gca,'xticklabels',{'Run1','Run2'},'Fontsize',16)
@@ -203,7 +203,7 @@ b1 = bar(model_series); %,'FaceColor',gray_matrix([22,:));
 b1(1).FaceColor = gray_index(1,:);
 %b1(2).FaceColor = gray_index(2,:);
 b1(2).FaceColor = gray_index(3,:);
-title(sprintf('MID Loss v Reward (Hit Rate)\nN = %1.0f',length(signal.loss.small.HRdata)),'Fontsize',30)
+title(sprintf('Monetary Incentive Delay: Loss v Reward (Hit Rate)\nN = %1.0f',length(signal.loss.small.HRdata)),'Fontsize',30)
 xlabel('Condition','Fontsize',24)
 ylabel('Hit Rate','Fontsize',24)
 legend('Small','Large')
@@ -238,7 +238,7 @@ b2(1).FaceColor = gray_index(1,:);
 %b2(2).FaceColor = gray_index(2,:);
 b2(2).FaceColor = gray_index(3,:);
 
-title(sprintf('MID Loss v Reward (Reaction Time)\nN = %1.0f', length(signal.loss.small.RTdata)),'Fontsize',30)
+title(sprintf('Monetary Incentive Delay: Loss v Reward (Reaction Time)\nN = %1.0f', length(signal.loss.small.RTdata)),'Fontsize',30)
 xlabel('Condition','Fontsize',24)
 ylabel('Reaction Time','Fontsize',24)
 legend('Small','Large')

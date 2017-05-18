@@ -2,11 +2,11 @@
 dbstop if error
 % Create string for MID_
 if ~exist('dataDir','var')
-    %dataDir = '/Users/tc587/fMRI/ABCD/AWS/aux_incoming_Feb_2017/';% Indicate where the data is housed
+    dataDir = '/Users/tc587/fMRI/ABCD//aux_incoming_Feb_2017/';% Indicate where the data is housed
     scriptDir = fullfile(pwd);
     a = regexp(scriptDir,'/');
     Home = getenv('HOME');
-    dataDir = [Home, fullfile(scriptDir(a(3):a(end-1)),'AWS/aux_incoming_Feb_2017')];
+    dataDir = [Home, fullfile(scriptDir(a(3):a(end-1)),'aux_incoming_Feb_2017')];
     outputDir = [Home, fullfile(scriptDir(a(3):a(end-1)),'Output/MID',datestr(now,'yyyymmdd'))];
     %outputDir = fullfile(scriptDir(1:a(end-1)),'Output/MID',datestr(now,'yyyymmdd'));
 end
@@ -176,12 +176,6 @@ for sitez = 1:length(sites) % Change back to 1 to start from top of cohort.  Cha
             if strcmpi(subDataMID.SessionTime(1),'TrialOrder') % Using the Dec experiment package
                 %subDataMID = importSubjDataMIDtableDecrepit(subDataPath);
                 subDataMID = importSubjDataMID13table(subDataPath);
-            elseif strcmpi(subDataMID.SessionTime(1),'EndFix.Duration')
-                subDataMID = importSubjDataMIDother(subDataPath);
-                subDataMID.TrialOrder = subDataMID.MIDVERSION;
-            elseif strcmpi(subDataMID.MIDVERSION(1),'SessionStartDateTimeUtc')
-                subDataMID = importSubjDataMIDother1(subDataPath);
-                %subDataMID.TrialOrder = subDataMID.MIDVERSION;
             end
             if isa(subDataMID,'logical')
                 if subDataMID == false
